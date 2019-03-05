@@ -1,0 +1,107 @@
+﻿
+
+
+@model IEnumerable<AuditReport.Models.ProjectSiteStatus>
+@{
+
+      ViewBag.Title = "ProjectSitePlanTaskInfoExisting";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var counter = 1;
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+
+}
+
+
+
+
+<div class="alert alert-primary text-center">
+    <div class="well well-sm">
+        <h5>Project Name: @Model.Where(x => x.ProjectId == Convert.ToInt32(Request["ProjectId"].ToString())).Select(y => y.Project.Name).FirstOrDefault()</h5>
+        <h6>Site Name: @Model.Where(x => x.ProjectSiteId == Convert.ToInt32(Request["SiteId"].ToString())).Select(y => y.ProjectSite.Name).FirstOrDefault()</h6>
+    </div>
+
+
+
+    <h4>Project Status</h4>
+   
+   
+    <div class="form-inline">
+        <div class="form-group">
+            <label>Plan Date</label>
+            @Html.TextBox("PlanDate", null, new { @disabled = "disabled", @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Plan Code</label>
+            @Html.TextBox("PlanCode", null, new { @disabled = "disabled", @style = "width:80px;", @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <label>Status Date</label>
+            @Html.TextBox("SiteStatusDate", null, new { @disabled = "disabled", @class = "form-control" })
+        </div>
+        @*<input type="button" class="btn btn-xs btn-primary" value="Save" id="saveState" />*@
+        @Html.Hidden("ProjectId")
+        @Html.Hidden("SiteId")
+    </div>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-sm StatusTable">
+        @*<tr>
+            <td>Plan Date</td>
+            <td>@Html.TextBox("PlanDate", null, new { @disabled = "disabled" })</td>
+            <td>Plan Code</td>
+            <td>@Html.TextBox("PlanCode", null, new { @disabled = "disabled", @style = "width:80px;" })</td>
+            <td colspan="3">
+
+                @Html.Hidden("ProjectId")
+                @Html.Hidden("SiteId")
+            </td>
+            <td>Status Date</td>
+            <td>@Html.TextBox("SiteStatusDate", null, new { @disabled = "disabled" })</td>
+        </tr>*@
+        <tr class="bg-blue">
+            <th>Id</th>
+            <th>Task Name</th>
+            <th>WBS</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Previous Status</th>
+            <th>Percent(%) Comp</th>
+            <th>Present Status</th>
+            <th>Actual Compression Date</th>
+            <th>Deviation</th>
+            <th>Reason for Deviation</th>
+            <th>Remarks</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            var TaskName = db.ProjectTask.Where(x => x.Id == item.ProjectTaskId).Select(y => y.Name).FirstOrDefault();
+            //var prevdate = db.ProjectSiteStatus.TakeWhile(x => x.SiteStatusDate != item.SiteStatusDate).LastOrDefault();
+            //var prevdata = db.ProjectSiteStatus.Where(x => x.SiteStatusDate == prevdate.SiteStatusDate).Select(y => y.PresentStatus).FirstOrDefault();
+            var AcctualCompressionDate = item.AcctualCompressionDate;
+            <tr>
+                <td>@counter</td>
+                <td style="min-width:400px;">@TaskName</td>
+                <td>@item.WBSCode </td>
+                <td>@item.StartDate.Value.ToShortDateString()</td>
+                <td>@item.EndDate.Value.ToShortDateString() </td>
+                <td>@Html.Hidden("PrevStatus")</td>
+                <td>@item.Percentage </td>
+                <td>@item.PresentStatus </td>
+                <td>@if(AcctualCompressionDate !=null)
+                    {
+                        @AcctualCompressionDate.Value.ToShortDateString();
+                    }
+                </td>
+                <td>@item.Deviation</td>
+                <td>@item.ResDeviation</td>
+                <td>@item.Remarks</td>
+            </tr>
+            counter++;
+        }
+
+    </table>
+</div>
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("statusList", new { SitePlanDate = Convert.ToDateTime(Request["PlanDate"].ToString()), ProjectId = Convert.ToInt32(Request["ProjectId"].ToString()), SiteId = Convert.ToInt32(Request["SiteId"].ToString()), PlanCode = Request["PlanCode"].ToString() })';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>

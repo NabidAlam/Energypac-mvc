@@ -1,0 +1,295 @@
+﻿
+@model PagedList.IPagedList<AuditReport.Models.ProjectSite>
+    @using PagedList.Mvc;
+    @{
+        ViewBag.Title = "Index";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+
+
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title"><i class=" icon-task position-left"></i>Project Site </h5><hr />
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><a data-action="collapse"></a></li>
+                    <li><a data-action="reload"></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p>
+                <div class="col-md-3">
+                    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success btn-xs" })
+
+
+                </div>
+                   
+
+
+                    <div class="col-md-6">
+                        @using (@Html.BeginForm("Index", "ProjectSites", FormMethod.Post))
+                        {
+                               @*@Html.Hidden("ProjectId")*@
+                          
+                             <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                
+                                @Html.DropDownList("ProjectId", null, "--Select--", new { @class = "form-control select2", @required = "required", @Id = "ProjectId" })
+                                @*<input type="text" class="typeahead form-control" data-provide="typeahead" id="ProjectName" name="ProjectName">*@
+                                
+                            </div>
+                        </div>
+                     
+                         <div class="form-group">
+                            @Html.Label("Site", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("SiteId", new SelectList(string.Empty, "Value", "Text"), "--Select--", new { @class = "form-control select2", @Id = "SiteId" })
+                              
+                            </div>
+                        </div>
+                        <div class="form-group">
+                          
+                            <div class="col-md-offset-2 col-md-10">
+                              <input value="Search" class="btn btn-primary" type="submit" />
+
+                            </div>
+                        </div>
+                    </div>
+                         <!--new end-->
+                          
+                        }
+
+                    </div>
+
+
+
+              </p>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table table-xxs">
+                <tr class="bg-blue">
+                    <th class="col-lg-4">
+                        Project Name
+                    </th>
+                    <th class="col-lg-2">
+                        Site Name
+                    </th>
+                    <th class="col-lg-1">
+                        Location
+                    </th>
+                    <th class="col-lg-1">
+                        Site Status
+                    </th>
+                    <th class="col-lg-1">
+                        Remarks
+                    </th>
+
+                    <th class="col-lg-3"></th>
+                </tr>
+                @{
+                    int projId = 0;
+                }
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @{
+                    if (projId != item.ProjectId)
+                    {
+                        projId = item.ProjectId;
+                        <td>
+                            @Html.ActionLink(item.Project.Name, "Details", "Projects", new { id = item.ProjectId }, null)
+                            @*@Html.DisplayFor(modelItem => item.Project.Name)*@
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="border-top:0">
+                            &nbsp;
+                        </td>
+                    };
+
+
+                        }
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.Location)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.SiteStatus)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.Remarks)
+                        </td>
+
+                        <td>
+                            @Html.ActionLink(" ", "Edit", new { id = item.Id }, new { @class = "btn btn-xs text-info icon-pencil4", @title = "Edit" }) |
+                            @Html.ActionLink(" ", "Details", new { id = item.Id }, new { @class = "btn btn-xs text-info  icon-file-text2", @title = "Details" }) |
+                            @Html.ActionLink(" ", "ImageUpload", "SiteImage", new { ProjectId = item.ProjectId, SiteId = item.Id }, new { @class = "btn btn-xs text-info icon-images2", @title = "Upload Image" }) |
+                            @*@Html.ActionLink(" ", "Delete", new { id = item.Id }, new { @class = "btn btn-xs text-danger icon-cross2", @title = "Delete" })*@
+                            <a class="btn btn-xs text-danger icon-cross2" title="Delete" href="javascript:deleteFunction(@item.Id)"></a>
+
+                        </td>
+                    </tr>
+                }
+
+            </table>
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+        </div>
+    </div>
+
+
+
+
+
+
+    <script>
+        function deleteFunction(SiteId) {
+            var Con = confirm("Are you sure want to delete this?");
+            if (Con === true) {
+                $.ajax({
+                    url: "/ProjectSites/DeleteSites",
+                    type: "post",
+                    data: {
+                        id: SiteId
+                    },
+                    dataType: "json",
+
+                    success: function (flag) {
+                        console.log(flag);
+
+                        if (flag.flag === true) {
+                            alert("Successfully deleted !");
+                            window.location = "/ProjectSites/";
+                        } else {
+                            alert(flag.message);
+                        }
+
+                    },
+
+                    error: function (xhr) {
+                        alert('error');
+
+                    }
+
+
+                });
+            }
+
+        }
+    </script>
+
+
+
+
+    <!--Added by Nabid Typehead 26th Sept, 2017-->
+    @section scripts
+{
+        @Scripts.Render("~/bundles/typeahead")
+        @Scripts.Render("~/bundles/typeahead-bloodhound")
+        @Scripts.Render("~/bundles/typeahead-jquery")
+
+                               @Scripts.Render("~/bundles/jqueryval")
+
+
+                               <script src="~/Plugins/select2/select2.min.js"></script>
+                               <script>
+                                   $(".select2").select2();
+                               </script>
+
+        @*<script type="text/javascript">
+
+        $(function () {
+
+            $("#ProjectName").autocomplete({
+                minLength: 0,
+                source: function (request, response) {
+                    $.get('@Url.Action("Search", "ProjectSitePlanTasks")', request, function (resp) {
+                        response(resp);
+                    });
+                },
+                focus: function (event, ui) {
+                    $("#ProjectId").val(ui.item.Name);
+                    return false;
+                },
+
+                select: function (event, ui) {
+
+                    $("#ProjectId").val(ui.item.Id);
+                    $("#ProjectName").val(ui.item.Name);
+
+                    $.ajax({
+                        type: "post",
+                        url: "/Projects/Sites",
+                        data: { ProjectId: ui.item.Id },
+                        datatype: "json",
+                        traditional: true,
+                        success: function (data) {
+                            var sites = "<select id='sites'>";
+                            sites = sites + '<option value="">--Select--</option>';
+                            for (var i = 0; i < data.length; i++) {
+                                sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                            }
+                            sites = sites + '</select>';
+                            $('#SiteId').html(sites);
+                        }
+                    });
+                    return false;
+                }
+            }).autocomplete("instance")._renderItem = function (ul, item) {
+                return $("<li>")
+                    .append("<a>" + item.Name + "</a>")
+                    .appendTo(ul);
+            };
+        });
+        </script>*@
+
+
+
+                               <script>
+                                   $(document).ready(
+                                function (Id) {
+
+                                    $("#ProjectId").change(function () {
+
+                                        $.ajax({
+                                            type: "post",
+                                            url: "/Projects/Sites",
+                                            data: { ProjectId: $('#ProjectId').val() },
+                                            datatype: "json",
+                                            traditional: true,
+                                            success: function (data) {
+                                                var sites = "<select id='sites'>";
+                                                sites = sites + '<option value="">--Select--</option>';
+                                                for (var i = 0; i < data.length; i++) {
+                                                    sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                                                }
+                                                sites = sites + '</select>';
+                                                $('#SiteId').html(sites);
+                                            }
+                                        });
+
+                                    });
+
+                                });
+
+
+
+                               </script>
+
+
+    }

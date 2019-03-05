@@ -1,0 +1,57 @@
+﻿
+
+<link href="~/Content/Video/video-js.css" rel="stylesheet" />
+
+<script src="~/Content/Video/videojs-ie8.min.js"></script>
+
+@{
+    ViewBag.Title = "VideoGallery";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+    var projectId = (int)ViewBag.ProjectId;
+    var siteId = (int)ViewBag.SiteId;
+    var grpimages = db.ProjectSiteImage.Where(u => u.ProjectId == projectId && u.ProjectSiteId == siteId).GroupBy(x => System.Data.Entity.DbFunctions.TruncateTime(x.ImageDate)).Select(x => new { Date = x.Key, Images = x });
+
+}
+
+
+
+
+    @foreach (var i in grpimages)
+    {
+        <h3> @i.Date.Value.ToShortDateString()</h3>
+
+        foreach (var item in i.Images)
+        {
+            string filename = Path.GetFileName(item.ImageURL);
+            string ext = Path.GetExtension(item.ImageURL).ToLower();
+            List<string> allowedExtension = new List<string> { ".mp4", ".avi", ".wmv", ".3gp", ".mkv" };
+            if (allowedExtension.IndexOf(ext) != -1)
+            {
+
+                @*<video src="@Url.Content(@item.ImageURL)" height="160" type="video/mp4" controls width="160"></video>*@
+
+
+    <video id="my-video" class="video-js" controls preload="auto" width="640" height="264"
+           poster="http://1e4e4f866fe9dacf83e3-8fcaeeff6a9d1b268c45b34c024debc1.r77.cf1.rackcdn.com/global/imagelib/usa_today_cannes_lions/inspiration-video-thumbnail-placeholder_with_button.png" data-setup="{}">
+        <source src="@Url.Content(@item.ImageURL)" type='video/mp4'>
+        <source src="@Url.Content(@item.ImageURL)" type='video/webm'>
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+        <br />
+
+
+            }
+        }
+
+
+
+    }
+
+
+
+<script src="~/Content/Video/video.js"></script>

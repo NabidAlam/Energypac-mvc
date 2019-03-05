@@ -1,0 +1,91 @@
+﻿@model AuditReport.Models.ProjectSitePlanTask
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ProjectSitePlanTask</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Project.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Project.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectSite.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProjectSite.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WBSCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WBSCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MileStone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MileStone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CompletionPer)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CompletionPer)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CompletionDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CompletionDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Remarks)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Remarks)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

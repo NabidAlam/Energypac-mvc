@@ -1,0 +1,122 @@
+﻿
+@using AuditReport.Helper
+
+@model IEnumerable<AuditReport.ViewModel.VMPlanTaskStatusFull>
+@{
+
+      ViewBag.Title = "ProjectSitePlanTaskInfoExisting";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var counter = 1;
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+
+}
+
+@helper GetSepString(int cnt)
+{
+var strSep = "";
+
+for (var i = 0; i < cnt; i++)
+{
+    strSep = strSep + "--> ";
+}
+
+    @strSep
+}
+
+
+<div class="alert alert-primary text-center">
+    <div class="well well-sm">
+        <h5>Project Name: @ViewBag.ProjectName</h5>
+        <h6>Site Name: @ViewBag.ProjectSiteName</h6>
+    </div>
+
+
+
+    <h4>Project Status</h4>
+   
+   
+    <div class="form-inline">
+        <div class="form-group">
+            <label class="text-bold">Plan Date</label>
+            <div class="form-control-static">@ViewBag.PlanDate</div>
+            @*@Html.TextBox("PlanDate", null, new { @disabled = "disabled", @class = "form-control" })*@
+        </div>
+        <div class="form-group">
+            <label class="text-bold">Plan Code</label>
+            <div class="form-control-static">@ViewBag.PlanCode</div>
+            @*@Html.TextBox("PlanCode", null, new { @disabled = "disabled", @style = "width:80px;", @class = "form-control" })*@
+        </div>
+
+        <div class="form-group">
+            <label class="text-bold">Status Date</label>
+            <div class="form-control-static">@ViewBag.SiteStatusDate</div>
+            @*@Html.TextBox("SiteStatusDate", null, new { @disabled = "disabled", @class = "form-control" })*@
+            @Html.Hidden("SiteStatusDate")
+        </div>
+        <input type="button" class="btn btn-xs btn-success" value="Save" id="saveState" />
+        @*<input type="button" class="btn btn-xs btn-primary" value="Save" id="saveState" />*@
+        @*@Html.Hidden("ProjectId")
+        @Html.Hidden("SiteId")*@
+    </div>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-xxs StatusTable">
+        @*<tr>
+            <td>Plan Date</td>
+            <td>@Html.TextBox("PlanDate", null, new { @disabled = "disabled" })</td>
+            <td>Plan Code</td>
+            <td>@Html.TextBox("PlanCode", null, new { @disabled = "disabled", @style = "width:80px;" })</td>
+            <td colspan="3">
+
+                @Html.Hidden("ProjectId")
+                @Html.Hidden("SiteId")
+            </td>
+            <td>Status Date</td>
+            <td>@Html.TextBox("SiteStatusDate", null, new { @disabled = "disabled" })</td>
+        </tr>*@
+        <tr class="bg-blue">
+            <th>Id</th>
+            <th style="min-width:300px;">Task Name</th>
+            <th>WBS</th>
+            <th>Start Date (Planned)</th>
+            <th>End Date (Planned)</th>
+            <th>Previous Status</th>
+            <th>Start Date</th>
+            <th>Tentative End Date</th>
+            <th>Perc(%) Comp</th>
+            <th>Present Status</th>
+            <th>Actual Completion Dt</th>
+            <th>Deviation</th>
+            <th>Reason for Deviation</th>
+            <th>Remarks</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            //var TaskName = db.ProjectTask.Where(x => x.Id == item.ProjectTaskId).Select(y => y.Name).FirstOrDefault();
+            //var prevdate = db.ProjectSiteStatus.TakeWhile(x => x.SiteStatusDate != item.SiteStatusDate).LastOrDefault();
+            //var prevdata = db.ProjectSiteStatus.Where(x => x.SiteStatusDate == prevdate.SiteStatusDate).Select(y => y.PresentStatus).FirstOrDefault();
+            //var AcctualCompressionDate = item.CompletionDate;
+            <tr>
+                <td>@counter</td>
+                <td>@GetSepString(item.IndLevel) @item.Name</td>
+                <td>@item.WBS </td>
+                <td>@item.PlanStartDate.Value.ToShortDateString()</td>
+                <td>@item.PlanEndDate.Value.ToShortDateString() </td>
+                <td>@Html.Hidden("PrevStatus")</td>
+                <td>@NullHelper.DateToString(item.StartDate)</td>
+                <td>@NullHelper.DateToString(item.EndDate)</td>
+                <td>@item.PerComp </td>
+                <td>@item.PresentStatus </td>
+                <td>@NullHelper.DateToString(item.CompletionDate)</td>
+                <td>@item.Deviation</td>
+                <td>@item.ResDeviation</td>
+                <td>@item.Remarks</td>
+            </tr>
+            counter++;
+        }
+
+    </table>
+</div>
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("statusList", new { PId=ViewBag.PId })';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>

@@ -1,0 +1,94 @@
+﻿@model IEnumerable<AuditReport.ViewModel.VMNearTask>
+
+@{
+    ViewBag.Title = "Task Status";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+}
+
+
+@*@{var data = Model.Select(x => new { x.SiteStatusDate, x.ProjectId, x.PlanCode, x.ProjectSiteId, x.SitePlanDate }).FirstOrDefault();}*@
+
+@if (Model.Count() != 0)
+{
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title "><i class="icon-task position-left"></i>Task Status</h5> <hr />
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><a data-action="collapse"></a></li>
+                    <li><a data-action="reload"></a></li>
+                </ul>
+            </div>
+        </div>     
+        
+        <div class="table-responsive">
+
+            <table class="table table-xxs" id="TaskTable">
+                <thead>
+                <tr class="bg-blue">                    
+                    <th>Project</th>
+                    <th>Site</th>
+                    <th>Task</th>
+                    <th>End Date</th>
+                    <th>Status Date</th>                    
+                    <th>Status</th>                     
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>                        
+                        <td>@item.ProjectName</td>
+                        <td>@item.SiteName</td>
+                        <td>@item.TaskName</td>
+                        <td>@AuditReport.Helper.NullHelper.DateToString(item.EndDate)</td>    
+                        <td>@AuditReport.Helper.NullHelper.DateToString(item.StatusDate)</td>                                            
+                        <td>@Html.ActionLink("Status", "StatusList", "ProjectSitePlanTasks", new { PId = item.PlanId}, new { @class = "label label-info" })</td>
+                        
+                    </tr>
+                }
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
+
+
+
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+
+
+
+@section Scripts {
+    <script>
+        //$(document).ready(function () {
+        //    $('#TaskTable').DataTable();
+        //});
+
+
+        //-----------------
+
+        $(function () {
+
+
+            // Table setup
+            // ------------------------------
+
+            // Setting datatable defaults
+            
+            // Basic datatable
+            $('#TaskTable').DataTable();
+
+           
+
+        });
+
+    </script>
+
+
+}

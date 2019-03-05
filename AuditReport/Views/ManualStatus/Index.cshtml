@@ -1,0 +1,177 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="login-overlay" class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Select Project, Site and Plandate to give status.</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                @using (Html.BeginForm("Index", "ManualStatus", FormMethod.Post))
+                {
+                    <div class="col-xs-8">
+
+                        <div class="well">
+
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label for="Project" class="control-label">Project</label>
+                                @Html.DropDownList("ProjectId", null, "Select Project", new { @class = "form-control select2", @required = "required", @Id = "ProjectId" })
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Site" class="control-label">Site</label>
+                                @Html.DropDownList("SiteId", new SelectList(string.Empty, "Value", "Text"), "", new { @class = "form-control select2", @required = "required", @Id = "SiteId" })
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Type" class="control-label">Plan Code</label>
+                                @Html.DropDownList("SitePlanCode", new SelectList(string.Empty, "Value", "Text"), "", new { @class = "form-control", @required = "required" })
+                                <span class="help-block"></span>
+                            </div>
+
+                        </div>
+                        @Html.ValidationSummary(true, "", new { @style = "color:red; text-align:center;" })
+                    </div>
+                    <div class="col-xs-4">
+                        <div>
+
+                            <span class="icon icon-bars-alt text-slate-300" style="font-size:125px;color:#c6c6c6;"></span>
+                        </div>
+                        <button type="submit" name="submit" onclick="return CheckValid()" class="btn btn-primary btn-block">Search</button>
+                        <button type="button" name="NewStatus" class="btn btn-success btn-block" id="NewStatus">New Status</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function CheckValid()
+    {
+        if ($('#ProjectId option:selected').text() == "Select Project") {
+            alert('Please select project');
+            $('#ProjectId option:selected').focus();
+            return false;
+
+        }
+        else if ($('#SiteId option:selected').text() == "--Select--") {
+            alert('Please select site');
+            $('#SiteId option:selected').focus();
+            return false;
+        }
+        else if ($('#SitePlanCode option:selected').text() == "--Select--") {
+            alert('Please select plan');
+            $('#SitePlanCode option:selected').focus();
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+    $(document).ready(
+ function (Id) {
+
+     $("#ProjectId").change(function () {
+
+         $.ajax({
+             type: "post",
+             url: "/Projects/Sites",
+             data: { ProjectId: $('#ProjectId').val() },
+             datatype: "json",
+             traditional: true,
+             success: function (data) {
+                 var sites = "<select id='sites'>";
+                 sites = sites + '<option value="">--Select--</option>';
+                 for (var i = 0; i < data.length; i++) {
+                     sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                 }
+                 sites = sites + '</select>';
+                 $('#SiteId').html(sites);
+             }
+         });
+
+     });
+
+     $("#SiteId").change(function () {
+
+         //if ($("#SiteId").val() == '') {
+         //    alert('heelo');
+         //}
+
+         $.ajax({
+             type: "post",
+             url: "/ManualStatus/GetPlanCode",
+             data: { SiteId: $('#SiteId').val() },
+             datatype: "json",
+             traditional: true,
+             success: function (data) {
+                 var sites = "<select>";
+                 sites = sites + '<option value="">--Select--</option>';
+                 for (var i = 0; i < data.length; i++) {
+                     sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                 }
+                 sites = sites + '</select>';
+                 $('#SitePlanCode').html(sites);
+             }
+         });
+
+     });
+
+     $('#NewStatus').click(function (e) {
+         console.log($('#ProjectIdoption:selected').text());
+         
+         if ($('#ProjectId option:selected').text() == "Select Project") {
+             alert('Please select project');
+             $('#ProjectId option:selected').focus();
+
+         }
+         else if ($('#SiteId option:selected').text() == "--Select--") {
+             alert('Please select site');
+             $('#SiteId option:selected').focus();         
+         }
+         else if ($('#SitePlanCode option:selected').text() == "--Select--") {
+             alert('Please select plan');
+             $('#SitePlanCode option:selected').focus();
+         }
+         else {
+             
+             //ProjectSitePlanTasks/StatusList?PId=5
+             window.location.href = '/ProjectSitePlanTasks/ProjectSitePlanTaskInfo?PId=' + $("#SitePlanCode").val();
+             
+
+         }
+
+     });
+
+ });
+
+
+
+
+
+
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Plugins/select2/select2.min.js"></script>
+    <script>
+        $(".select2").select2();
+    </script>
+
+
+
+
+}

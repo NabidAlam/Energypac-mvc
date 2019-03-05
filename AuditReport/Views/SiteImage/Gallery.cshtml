@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewBag.Title = "Gallery";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="login-overlay" class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Select Project and Site to explore gallery.</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+@using (Html.BeginForm())
+                        {
+                <div class="col-xs-8">
+
+                    <div class="well">
+             
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label for="Project" class="control-label">Project</label>
+                                @Html.DropDownList("ProjectId", null, "Select Project", new { @class = "form-control", @required = "required", @Id = "ProjectId" })
+                                <span class="help-block"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Site" class="control-label">Site</label>
+                                @Html.DropDownList("SiteId", new SelectList(string.Empty, "Value", "Text"), "", new { @class = "form-control", @required = "required", @Id = "SiteId" }) 
+                                <span class="help-block"></span>
+                            </div>
+                        <div class="form-group">
+                            <label for="Type" class="control-label">Want to see</label>
+                            @Html.DropDownList("Type", new List<SelectListItem>
+{
+new SelectListItem{Text="Image",Value="Image"},
+new SelectListItem{Text="Video",Value="Video"}}, new { @class = "form-control", @required = "required", @Id = "SiteId" })
+                            <span class="help-block"></span>
+                        </div>
+                        
+                    </div>
+                    @Html.ValidationSummary(true, "", new { @style = "color:red; text-align:center;" })
+                </div>
+                <div class="col-xs-4">
+                    <div>
+
+                        <span class="icon icon-image2" style="font-size:175px;color:#c6c6c6;"></span>
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-success btn-block">Explore</button>
+                </div>
+}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(
+ function (Id) {
+
+     $("#ProjectId").change(function () {
+
+         $.ajax({
+             type: "post",
+             url: "/Projects/Sites",
+             data: { ProjectId: $('#ProjectId').val() },
+             datatype: "json",
+             traditional: true,
+             success: function (data) {
+                 var sites = "<select id='sites'>";
+                 sites = sites + '<option value="">--Select--</option>';
+                 for (var i = 0; i < data.length; i++) {
+                     sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                 }
+                 sites = sites + '</select>';
+                 $('#SiteId').html(sites);
+             }
+         });
+
+     });
+
+ });
+
+
+
+</script>

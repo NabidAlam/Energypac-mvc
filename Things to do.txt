@@ -1,0 +1,106 @@
+## Unique -> Status date, task ID in status (by app)
+## milestone
+## milestone color in status form
+## left outer join on selecting status record
+## non editable :previous status, previous tentative end date,start date 
+## show active field in plan list
+## actual completion date with update comp perc
+## project site status complete when all task complete
+## plan task delete check if status exists
+## link on table rows to navigate easily
+## status in project index
+
+Auto WBS
+
+project wise user action
+
+image upload
+
+plan code auto
+
+page reroute after saving or update
+
+search 
+
+paging
+
+dynamic back page link
+
+projectSitePlanTask->SavePlanTaskStatus improve code for site and project update operation
+
+when status is deleted update site and project status also
+
+check images is ok showin in project 
+
+add a on screen navigation up and down scroll on status form
+
+delete project site will delete project images if available.
+
+user access acording to role
+
+set maximum height for status table so it is easily scrollable
+
+validate isAuth for neartask query
+
+---------------------
+new requirement
+------------------------
+Role: Admin, Management, Operator
+
+
+Status Form
+----------------------
+if planned date available then put it to start and tentative end date for time status entry
+
+text area for status, reson, remarks
+
+when perc 100 then actual complettion date will be status date.
+
+
+status form (management)
+--------------------------
+
+non editable: deviation (tentative end date deviation from previous tentative end date)
+
+Status form (operator)
+-------------------------- 
+dont show plan date, reason for deviation, prev perc, prev tentative date, previous status, 
+
+non editable: start date, tentative end date, deviation(deviation from status date to tentative end date)
+
+
+
+Notification
+---------------
+user will get alert 
+---------------------
+if tentative date is equal or less than 7days from current date
+
+If tentative is passed
+
+
+
+Authorization/Approval
+--------------------------
+
+operator user entry status need approval from Management level user
+
+
+
+
+
+--------------------------
+--------------------------
+
+[ProjectSiteStatus] -> IS_AUTH,INSERTED_BY,INSERTED_ON,AUTH_BY,AUTH_ON
+
+--------------------------
+--------------------------
+
+[ ] All -> Authorized
+Project Name, Site Name, Status Date, Input By, Authorize[Pending], action [authorize]
+
+
+----------------------------------
+
+Project Site 

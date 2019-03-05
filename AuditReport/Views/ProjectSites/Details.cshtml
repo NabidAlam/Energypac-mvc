@@ -1,0 +1,188 @@
+﻿@using System.Data.Entity;
+
+@model AuditReport.Models.ProjectSite
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+    var siteResources = db.ProjectSiteResource.Where(x => x.ProjectSiteId == Model.Id).ToList();
+
+}
+
+
+<div class="row">
+
+    <div class="panel panel-primary border-bottom-blue">
+        <div class="panel-heading">
+            <h6 class="panel-title">@Html.DisplayFor(model => model.Name)</h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><a data-action="collapse"></a></li>
+                    <li><a data-action="reload"></a></li>
+                    <li><a data-action="close"></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "pull-right btn btn-xs btn-primary" })
+            <dl class="dl-horizontal">
+                <dt>
+                   Project Name
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Project.Name)
+                </dd>
+
+                <dt>
+                   Site Name
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Location)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Location)
+                </dd>
+
+                <dt>
+                  Status
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.SiteStatus)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Remarks)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Remarks)
+                </dd>
+
+            </dl>
+
+            <div class="row">
+
+                <div class="panel panel-primary border-bottom-blue">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Site Resources</h6>
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li><a data-action="collapse"></a></li>
+                                <li><a data-action="reload"></a></li>
+                                <li><a data-action="close"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <tr class="bg-blue">
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Phone</th>
+                            </tr>
+
+                            @foreach (var item in siteResources)
+                            {
+                                var resource = db.CompanyResource.Where(x => x.Id == item.CompanyResourceId).FirstOrDefault();
+                                <tr>
+                                    <td>@Html.DisplayFor(model => resource.Name)</td>
+                                    <td>@Html.DisplayFor(model => resource.Position)</td>
+                                    <td>@Html.DisplayFor(model => resource.Phone)</td>
+                                </tr>
+
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+@{
+
+    var grpimages = db.ProjectSiteImage.Where(p=>p.ProjectSiteId==Model.Id).GroupBy(x => DbFunctions.TruncateTime(x.ImageDate)).Select(x => new { Date = x.Key, Images = x });
+
+}
+
+
+
+@foreach (var i in grpimages)
+{
+    <h3> @i.Date.Value.ToShortDateString()</h3>
+    <table class="table">
+
+
+        @foreach (var item in i.Images)
+        {
+            string filename = Path.GetFileName(item.ImageURL);
+            <tr>
+                <td><img src="@Url.Content(@item.ImageURL)" width="100" height="100"></td><td>@filename</td><td><a class="btn btn-xs text-danger icon-cross2" , title="Delete" href="javascript:deleteImage(@item.Id)"></a></td>
+            </tr>
+
+        }
+
+    </table>
+
+}
+
+
+
+
+
+
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+
+
+
+
+
+<script>
+    function deleteImage(ImageId) {
+        var Con = confirm("are you sure want to delete this image?");
+        if (Con == true) {
+            $.ajax({
+                url: "/ProjectSites/DeleteImages",
+                type: "post",
+                data: {
+                    id: ImageId
+                },
+                dataType: "json",
+
+                success: function (flag) {
+                    console.log(flag);
+                    if (flag == true) {
+                        location.reload();
+                        alert("Successfully deleted !");
+                    }
+                    else
+                    {
+                        alert('Error');
+                    }
+                  
+                }
+
+            });
+        }
+
+    }
+</script>

@@ -1,0 +1,142 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div>
+        <!-- Basic layout-->
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title"><i class=" icon-stack-plus position-left"></i>Site Plan Task Status</h5><hr />
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li><a data-action="collapse"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+
+                    
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    </div>
+    <p>
+        @Html.ActionLink("Create New", "Index", null, new { @class = "btn btn-success btn-xs" })
+    </p>
+                    <table>
+                        <tr>
+                            <td>Plan Date</td>
+                            <td>
+                                @Html.TextBox("PlanDate", DateTime.Now.ToShortDateString(), new { @id = "RName", @class = "form-control", @data_val = "true", @data_required = "true" })
+                                @Html.ValidationMessage("PlanDate", "", new { @class = "text-danger" })
+                            </td>
+                            <td>Plan Code</td>
+                            <td>
+                                @Html.TextBox("PlanCode", 1.01, new { @id = "RName", @class = "form-control", @data_val = "true", @data_required = "true" })
+                                @Html.ValidationMessage("PlanCode", "", new { @class = "text-danger" })
+                            </td>
+                            <td>Status Date</td>
+                            <td>
+                                @Html.TextBox("StatusDate", DateTime.Now.ToShortDateString(), new { @id = "RName", @class = "form-control", @data_val = "true", @data_required = "true" })
+                                @Html.ValidationMessage("PlanCode", "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered Task-list">
+
+                            <tr class="bg-blue">
+                                <th>Task Id</th>
+                                <th>Task Name</th>
+                                <th>WBS Code</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Previous Status</th>
+                                <th>Percent(%)Comp</th>
+                                <th>Present Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                            <tr>
+                                <td>@Html.TextBox("TaskId", 1, new {@readonly="readonly" })</td>
+                                <td>@Html.TextBox("TaskName", "Deed of Agreement", new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("WBS", 1, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("StartDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("EndDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("PreviousStatus", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("Percent")</td>
+                                <td>@Html.TextBox("PresentStatus")</td>
+                                <td>@Html.TextBox("Remarks")</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.TextBox("TaskId", 2, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("TaskName", "Contract Date", new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("WBS", 2, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("StartDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("EndDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("PreviousStatus", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("Percent")</td>
+                                <td>@Html.TextBox("PresentStatus")</td>
+                                <td>@Html.TextBox("Remarks")</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.TextBox("TaskId", 3, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("TaskName", "Commencement of Work", new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("WBS", 3, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("StartDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("EndDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("PreviousStatus", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("Percent")</td>
+                                <td>@Html.TextBox("PresentStatus")</td>
+                                <td>@Html.TextBox("Remarks")</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.TextBox("TaskId", 4, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("TaskName", "Initial Drawing Approval", new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("WBS", 4, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("StartDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("EndDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("PreviousStatus", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("Percent")</td>
+                                <td>@Html.TextBox("PresentStatus")</td>
+                                <td>@Html.TextBox("Remarks")</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.TextBox("TaskId", 5, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("TaskName", "Hand Over", new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("WBS", 5, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("StartDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("EndDate", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("PreviousStatus", null, new { @readonly = "readonly" })</td>
+                                <td>@Html.TextBox("Percent")</td>
+                                <td>@Html.TextBox("PresentStatus")</td>
+                                <td>@Html.TextBox("Remarks")</td>
+                            </tr>
+                        </table>
+                       
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+                        <div class="col-md-offset-5 col-md-10">
+                            <button type="submit" onclick='CreateProject();' class="btn btn-primary"><i class=" icon-add position-left"></i>  Save</button>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+</div>
+

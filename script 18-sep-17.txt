@@ -1,0 +1,23 @@
+INSERT INTO Roles(RoleName) values('Management');
+
+GO
+
+ALTER TABLE dbo.ProjectSiteStatus ADD
+	IsAuth bit NULL
+GO
+
+ALTER TABLE dbo.ProjectSiteStatus ADD
+	InsertedBy int NULL
+GO
+
+ALTER TABLE dbo.ProjectSiteStatus ADD
+	InsertedOn datetime NULL
+GO
+
+ALTER TABLE dbo.ProjectSiteStatus ADD
+	AuthBy int NULL
+GO
+
+ALTER TABLE dbo.ProjectSiteStatus ADD
+	AuthOn datetime NULL
+GO

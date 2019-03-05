@@ -1,0 +1,238 @@
+﻿
+@model PagedList.IPagedList<AuditReport.Models.Project>
+@using PagedList.Mvc;
+
+    @{
+        ViewBag.Title = "Index";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+
+
+
+
+<div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title"><i class="icon-stack3 position-left"></i>Project List</h5><hr />
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li><a data-action="collapse"></a></li>
+                    <li><a data-action="reload"></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p>
+
+                <div class="col-md-3">
+                    @Html.ActionLink("Create New", "Create",null, new { @class = "btn btn-success btn-xs" })
+                </div>
+
+
+                <!--Added by Nabid on 26 Sept 17-->
+                <div class="col-md-6">
+                    @using (@Html.BeginForm("Index", "Projects", FormMethod.Post))
+                    {
+                        <div class="form-horizontal">
+                            @*@Html.Hidden("ProjectId")*@
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+
+                                <div class="col-md-10">
+
+                                    @Html.DropDownList("ProjectId", null, "--Select--", new { @class = "form-control select2", @required = "required", @Id = "ProjectId" })
+                                    
+                                    @*<input type="text" class="typeahead form-control" data-provide="typeahead" id="ProjectName" name="ProjectName">*@
+                               
+                                 </div>
+                             </div>
+
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input value="Search" class="btn btn-primary" type="submit" />
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+
+                </div>
+
+                <!--End-->
+
+            </p>
+
+
+
+        </div>
+
+
+
+            <div class="table-responsive">
+
+                <table class="table table-xs">
+                    <tr class="bg-blue">
+
+                        <th class="col-lg-3">
+                            Project Group Name
+                        </th>
+                        <th class="col-lg-3">
+                            Project Name
+                        </th>
+                        <th class="col-lg-1">
+                            Start Date
+                        </th>
+                        <th class="col-lg-1">
+                            End Date
+                        </th>
+                        <th class="col-lg-1">Status</th>
+                        <th class="col-lg-3">&nbsp;</th>
+                    </tr>
+                    @{
+                        int projGrpId = 0;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            @{
+                        if (projGrpId != item.ProjectGroupId)
+                        {
+                            projGrpId = item.ProjectGroupId ?? 0;
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProjectGroup.Name)
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="border-top:0">
+                                &nbsp;
+                            </td>
+                        };
+
+
+                            }
+
+                            @*@Html.DisplayFor(modelItem => item.ProjectGroup.Name)*@
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DateToString(item.StartDate)
+                            </td>
+                            <td>
+                                @Html.DateToString(item.EndDate)
+                            </td>
+                            <td>@Html.DisplayFor(model => item.Status)</td>
+                            <td>
+                                @Html.ActionLink(" ", "Edit", new { id = item.Id }, new { @class = "btn btn-xs text-info icon-pencil4", @title = "Edit" }) |
+                                @Html.ActionLink(" ", "Details", new { id = item.Id }, new { @class = "btn btn-xs text-info  icon-file-text2", @title = "Details" }) |
+                                @*@Html.ActionLink(" ", "Delete", new { id = item.Id }, new { @class = "btn btn-xs text-danger icon-cross2", @title = "Delete" })*@
+                                <a class="btn btn-xs text-danger icon-cross2" title="Delete" href="javascript:deleteFunction(@item.Id)"></a>
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+
+            </div>
+            <p>
+                Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+            </p>
+
+
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+       
+
+    </div>
+
+
+
+
+
+    <script>
+        function deleteFunction(ProjectId) {
+            var Con = confirm("Are you sure want to delete this ?");
+            if (Con === true) {
+                $.ajax({
+                    url: "/Projects/DeleteProjects",
+                    type: "post",
+                    data: {
+                        id: ProjectId
+                    },
+                    dataType: "json",
+                    success: function (flag) {
+                        console.log(flag);
+
+                        if (flag.flag === true) {
+                            alert("Successfully deleted !");
+                            window.location = "/Projects/Index";
+                        } else {
+                            alert(flag.message);
+                        }
+                    },
+
+                    error: function (xhr) {
+                        alert('error');
+
+                    }
+
+
+                });
+            }
+
+        }
+    </script>
+
+
+    @section scripts
+{
+        @Scripts.Render("~/bundles/typeahead")
+        @Scripts.Render("~/bundles/typeahead-bloodhound")
+        @Scripts.Render("~/bundles/typeahead-jquery")
+
+
+                               @Scripts.Render("~/bundles/jqueryval")
+
+
+                               <script src="~/Plugins/select2/select2.min.js"></script>
+                               <script>
+                                   $(".select2").select2();
+                               </script>
+
+
+        <script type="text/javascript">
+            
+
+            $(function () {
+                $("#ProjectName").autocomplete({
+                    minLength: 0,
+                    source: function (request, response) {
+                        $.get('@Url.Action("Search", "ProjectSitePlanTasks")', request, function (resp) {
+                            response(resp);
+                        });
+                    },
+                    focus: function (event, ui) {
+                        $("#ProjectId").val(ui.item.Name);
+                        return false;
+                    }
+                    ,
+                    select: function (event, ui) {
+                        $("#ProjectId").val(ui.item.Id);
+                        $("#ProjectName").val(ui.item.Name);
+                        return false;
+                    }
+                }).autocomplete("instance")._renderItem = function (ul, item) {
+                    return $("<li>")
+                        .append("<a>" + item.Name + "</a>")
+                        .appendTo(ul);
+                };
+            });
+        </script>
+    }
+
+    

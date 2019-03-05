@@ -1,0 +1,194 @@
+﻿@model AuditReport.Models.ProjectSite
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+    var siteResources = db.ProjectSiteResource.Where(x => x.ProjectSiteId == Model.Id).ToList();
+
+}
+
+
+<div class="row">
+    <div class="col-md-10">
+        <!-- Basic layout-->
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title"><i class="icon-task position-left"></i> Edit Sites</h5><hr />
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li><a data-action="collapse"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("ProjectId", null, "Select Project", htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.ProjectId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SiteStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EnumDropDownListFor(model => model.SiteStatus, htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.SiteStatus, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remarks, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Remarks, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Remarks, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-primary"><i class="icon-add position-left"></i>  Save</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="panel panel-primary border-bottom-blue">
+        <div class="panel-heading">
+            <h6 class="panel-title">Site Resources</h6>
+            @*<div class="heading-elements">
+                <ul class="icons-list">
+                    <li><a data-action="collapse"></a></li>
+                    <li><a data-action="reload"></a></li>
+                    <li><a data-action="close"></a></li>
+                </ul>
+            </div>*@
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <tr class="bg-blue">
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Phone</th>
+                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resourceModal">Add
+</button></th>
+                </tr>
+
+                @foreach (var item in siteResources)
+                {
+                    var resource = db.CompanyResource.Where(x => x.Id == item.CompanyResourceId).FirstOrDefault();
+                    <tr>
+                        <td>@Html.DisplayFor(model => resource.Name)</td>
+                        <td>@Html.DisplayFor(model => resource.Position)</td>
+                        <td>@Html.DisplayFor(model => resource.Phone)</td>
+                       <td>@Html.ActionLink(" ", "ManualDeleteSiteResource", new { resourceId = item.CompanyResourceId, Siteid = item.ProjectSiteId }, new { @class = "btn btn-xs text-danger icon-cross2", @title = "Delete", onclick = "return confirm('Are you sure you wish to delete this?');" })</td>
+                    </tr>
+
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="resourceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add resource</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @Html.Hidden("ProjectId",Model.ProjectId)
+                @Html.Hidden("SiteId",Model.Id)
+                Name:@Html.DropDownList("RName", null, new { @id = "RName", @class = "form-control", @style = "width:500px;", @data_val = "true", @data_required = "true" })
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="Addresource" class="btn btn-primary" >Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*@section Scripts {
+@Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/bootstrap")
+}*@
+
+
+<script>
+    $('#Addresource').click(function (e) {
+        
+        var RId = $('#RName').val();
+        //var projectId = $('#ProjectId').val();
+        var siteId = $('#SiteId').val();
+              
+
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: '/ProjectSites/Addresource',
+            traditional: true,
+            data: JSON.stringify({'Rid':RId,'SiteId':siteId}),
+            success: function (result) {
+                console.log(result);
+                if (result) {   
+                    window.location = "/ProjectSites/Edit/"+siteId;
+                }
+            },
+            failure: function (response) {
+                alert('Error')
+            }
+        });
+    })
+</script>
+

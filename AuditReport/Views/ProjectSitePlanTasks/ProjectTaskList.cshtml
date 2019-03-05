@@ -1,0 +1,108 @@
+﻿@model IEnumerable<AuditReport.Models.ProjectTask>
+
+@{
+    ViewBag.Title = "ProjectTaskList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+<h4>Project Task List</h4>
+@using (Html.BeginForm())
+{
+    <table class="table" id="myTable">
+        <tr>
+            <th><input type="checkbox"  id="myCheckAll" />ALL</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th><input type="submit" value="Delete" />  </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    <input type="checkbox" class="cbCheck" name="TaskRecordDeletebyId" id="TaskRecordDeletebyId" value="@item.Id" />
+                </td>
+                <td>
+                   
+                    <button type="button" class="btn btn-xs btn-link" data-toggle="modal" data-target="#editModal" onclick="editTask(@item.Id,'@item.Name.ToString()') ">@item.Name.ToString()</button>
+             
+                 </td>
+        
+            </tr>
+        }
+
+    </table>
+    
+}
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @Html.Hidden("mdTaskId")
+               @Html.TextBox("mdTaskName", null, new {@class="form-control" })
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="editButton" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $("#editButton").click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/ProjectSitePlanTasks/editTask/",
+            data: { 
+                id: $("#mdTaskId").val(), // < note use of 'this' here
+                name: $("#mdTaskName").val() 
+            },
+            success: function(result) {
+                window.location = "/ProjectSitePlanTasks/ProjectTaskList";
+                alert('Save change record successfully !');
+                
+            },
+            error: function(result) {
+                alert('error');
+            }
+        });
+    });
+
+    function editTask(Id,Name)
+    {
+        $("#editModal #mdTaskId").val(Id);
+        $("#editModal #mdTaskName").val(Name);
+    }
+
+
+
+
+
+    $("#myCheckAll").click(function () {  
+        $(".cbCheck").prop('checked', $(this).prop('checked'));  
+    });  
+    $(".cbCheck").change(function () {
+        if (!$(this).prop("checked")) {
+            $("#myCheckAll").prop("checked", false);
+        }
+    });
+
+</script>

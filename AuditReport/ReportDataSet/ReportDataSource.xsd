@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ReportDataSource" targetNamespace="http://tempuri.org/ReportDataSource.xsd" xmlns:mstns="http://tempuri.org/ReportDataSource.xsd" xmlns="http://tempuri.org/ReportDataSource.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ReportDataSource" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ReportDataSource" msprop:Generator_UserDSName="ReportDataSource">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="ProjectStatusSummary" msprop:Generator_TableClassName="ProjectStatusSummaryDataTable" msprop:Generator_TableVarName="tableProjectStatusSummary" msprop:Generator_RowChangedName="ProjectStatusSummaryRowChanged" msprop:Generator_TablePropName="ProjectStatusSummary" msprop:Generator_RowDeletingName="ProjectStatusSummaryRowDeleting" msprop:Generator_RowChangingName="ProjectStatusSummaryRowChanging" msprop:Generator_RowEvHandlerName="ProjectStatusSummaryRowChangeEventHandler" msprop:Generator_RowDeletedName="ProjectStatusSummaryRowDeleted" msprop:Generator_RowClassName="ProjectStatusSummaryRow" msprop:Generator_UserTableName="ProjectStatusSummary" msprop:Generator_RowEvArgName="ProjectStatusSummaryRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Project" msprop:Generator_ColumnVarNameInTable="columnProject" msprop:Generator_ColumnPropNameInRow="Project" msprop:Generator_ColumnPropNameInTable="ProjectColumn" msprop:Generator_UserColumnName="Project" type="xs:string" minOccurs="0" />
+              <xs:element name="Client" msprop:Generator_ColumnVarNameInTable="columnClient" msprop:Generator_ColumnPropNameInRow="Client" msprop:Generator_ColumnPropNameInTable="ClientColumn" msprop:Generator_UserColumnName="Client" type="xs:string" minOccurs="0" />
+              <xs:element name="ProjectManager" msprop:Generator_ColumnVarNameInTable="columnProjectManager" msprop:Generator_ColumnPropNameInRow="ProjectManager" msprop:Generator_ColumnPropNameInTable="ProjectManagerColumn" msprop:Generator_UserColumnName="ProjectManager" type="xs:string" minOccurs="0" />
+              <xs:element name="SiteLocation" msprop:Generator_ColumnVarNameInTable="columnSiteLocation" msprop:Generator_ColumnPropNameInRow="SiteLocation" msprop:Generator_ColumnPropNameInTable="SiteLocationColumn" msprop:Generator_UserColumnName="SiteLocation" type="xs:string" minOccurs="0" />
+              <xs:element name="SiteManager" msprop:Generator_ColumnVarNameInTable="columnSiteManager" msprop:Generator_ColumnPropNameInRow="SiteManager" msprop:Generator_ColumnPropNameInTable="SiteManagerColumn" msprop:Generator_UserColumnName="SiteManager" type="xs:string" minOccurs="0" />
+              <xs:element name="TaskName" msprop:Generator_ColumnVarNameInTable="columnTaskName" msprop:Generator_ColumnPropNameInRow="TaskName" msprop:Generator_ColumnPropNameInTable="TaskNameColumn" msprop:Generator_UserColumnName="TaskName" type="xs:string" minOccurs="0" />
+              <xs:element name="StartDate" msprop:Generator_ColumnVarNameInTable="columnStartDate" msprop:Generator_ColumnPropNameInRow="StartDate" msprop:Generator_ColumnPropNameInTable="StartDateColumn" msprop:Generator_UserColumnName="StartDate" type="xs:string" minOccurs="0" />
+              <xs:element name="Previous1" msprop:Generator_ColumnVarNameInTable="columnPrevious1" msprop:Generator_ColumnPropNameInRow="Previous1" msprop:Generator_ColumnPropNameInTable="Previous1Column" msprop:Generator_UserColumnName="Previous1" type="xs:string" minOccurs="0" />
+              <xs:element name="Previous2" msprop:Generator_ColumnVarNameInTable="columnPrevious2" msprop:Generator_ColumnPropNameInRow="Previous2" msprop:Generator_ColumnPropNameInTable="Previous2Column" msprop:Generator_UserColumnName="Previous2" type="xs:string" minOccurs="0" />
+              <xs:element name="Previous3" msprop:Generator_ColumnVarNameInTable="columnPrevious3" msprop:Generator_ColumnPropNameInRow="Previous3" msprop:Generator_ColumnPropNameInTable="Previous3Column" msprop:Generator_UserColumnName="Previous3" type="xs:string" minOccurs="0" />
+              <xs:element name="PresentStatus" msprop:Generator_ColumnVarNameInTable="columnPresentStatus" msprop:Generator_ColumnPropNameInRow="PresentStatus" msprop:Generator_ColumnPropNameInTable="PresentStatusColumn" msprop:Generator_UserColumnName="PresentStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="Month" msprop:Generator_ColumnVarNameInTable="columnMonth" msprop:Generator_ColumnPropNameInRow="Month" msprop:Generator_ColumnPropNameInTable="MonthColumn" msprop:Generator_UserColumnName="Month" type="xs:string" minOccurs="0" />
+              <xs:element name="Year" msprop:Generator_ColumnVarNameInTable="columnYear" msprop:Generator_ColumnPropNameInRow="Year" msprop:Generator_ColumnPropNameInTable="YearColumn" msprop:Generator_UserColumnName="Year" type="xs:string" minOccurs="0" />
+              <xs:element name="EndDate" msprop:Generator_ColumnVarNameInTable="columnEndDate" msprop:Generator_ColumnPropNameInRow="EndDate" msprop:Generator_ColumnPropNameInTable="EndDateColumn" msprop:Generator_UserColumnName="EndDate" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

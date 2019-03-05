@@ -1,0 +1,92 @@
+﻿@model AuditReport.Models.ProjectSite
+@{
+    ViewBag.Title = "ImageUpload";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/dropzone.js"></script>
+
+<div class="alert alert-primary text-center">
+    <div class="well well-sm">
+        <h5>Project Name: @ViewBag.Project</h5>
+        <h6>Site Name: @ViewBag.Site</h6>
+    </div>
+</div>
+
+<button class="btn btn-primary btn-sm" id="submit-all"><i class="icon-upload4 position-left"></i> Upload</button>
+<form action="~/SiteImage/Upload" method="post" class="dropzone" id="my-dropzone">
+    @Html.Hidden("ProjectId",  Request.QueryString["ProjectId"])
+    @Html.Hidden("SiteId", Request.QueryString["SiteId"])
+    @Html.Hidden("PlanDate", Request.QueryString["PlanDate"])
+</form>
+
+
+
+
+
+
+    <p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index", "ProjectSites")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+    <script>
+        Dropzone.options.myDropzone = {
+
+            // Prevents Dropzone from uploading dropped files immediately
+            autoProcessQueue: false,
+            parallelUploads: 9999,
+            maxFilesize: 500000000,
+            init: function () {
+
+                var submitButton = document.querySelector("#submit-all")
+                myDropzone = this; // closure
+
+                submitButton.addEventListener("click", function () {
+                    myDropzone.processQueue(); // Tell Dropzone to process all queued files.
+                });
+
+                // You might want to show the submit button only when
+                // files are dropped here:
+                this.on("addedfile", function (file) {
+                    // Show submit button here and/or inform user to click it.
+                    // Create the remove button
+                    var removeButton = Dropzone.createElement("<button>Remove file</button>");
+                    // Capture the Dropzone instance as closure.
+                    var _this = this;
+
+                    // Listen to the click event
+                    removeButton.addEventListener("click", function (e) {
+                        // Make sure the button click doesn't submit the form:
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Remove the file preview.
+                        _this.removeFile(file);
+                        // If you want to the delete the file on the server as well,
+                        // you can do the AJAX request here.
+                    });
+
+                    // Add the button to the file preview element.
+                    file.previewElement.appendChild(removeButton);
+
+
+                });
+
+            }
+
+
+        };
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+

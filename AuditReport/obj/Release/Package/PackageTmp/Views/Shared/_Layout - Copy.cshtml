@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Audit Reporting System</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+        @Styles.Render("~/Content/css")
+        <link href="~/Content/icomoon/styles.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css" rel="stylesheet" />
+    @*<script src="/Scripts/jquery.validate.js"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.js"></script>*@
+
+    <style>
+        .modal-backdrop {
+            z-index: -1;
+        }
+    </style>
+    <style>
+        #dvLoading {
+            background: url(../../Content/images/loader.gif) no-repeat center center;
+            height: 100px;
+            width: 100px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            margin: -25px 0 0 -25px;
+        }
+    </style>
+    <script>
+        $(window).load(function () {
+            $('#dvLoading').fadeOut(500);
+        });
+    </script>
+</head>
+<body>
+    <!-- Main navbar -->
+    <div class="navbar navbar-inverse">
+
+        <div class="navbar-header">
+            <a class="navbar-brand" href="@Url.Action("Index","Home")"><img src="~/Content/images/logo_light.png" alt=""></a>
+            <ul class="nav navbar-nav visible-xs-block">
+                <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+                <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+            </ul>
+          
+            @Html.Partial("_LoginPartial")
+
+
+                @*<ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            User Name
+                            <span class="icon-arrow-down12"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="@Url.Action("LogOff","Account")"> Change Password</a></li>
+                            <li><a href="javascript:;"> Settings</a></li>
+                            <li><a href="javascript:;">Help</a></li>
+                            <li><a href="@Url.Action("LogOff","Account")"> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>*@
+            
+
+
+
+        </div>
+
+        <div class="navbar-collapse collapse" id="navbar-mobile">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
+            </ul>           
+
+        </div>
+        
+
+</div>
+    <!-- /main navbar -->
+    <!-- Page container -->
+    <div class="page-container">
+        <!-- Page content -->
+        <div class="page-content">
+            <!-- Main sidebar -->
+            <div class="sidebar sidebar-main">
+                <div class="sidebar-content">
+
+
+                    <!-- Main navigation -->
+                    <div class="sidebar-category sidebar-category-visible">
+                        <div class="category-content no-padding">
+                            <ul class="navigation navigation-main navigation-accordion">
+                                <!-- Main -->
+                                <li class="navigation-header"><span>Main Navigation</span> <i class="icon-menu" title="Main pages"></i></li>
+                                <li><a href="@Url.Action("Index","Home")"><i class="icon-home4"></i> <span>Dashboard</span></a></li>
+                              
+                                <li>
+                                    <a href="#"><i class=" icon-stack3"></i> <span>Project Information</span></a>
+                                    <ul>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Projects" ? "active" : "")"><a href="@Url.Action("Index", "Projects")"><span>Projects</span></a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ProjectSites" ? "active" : "")"><a href="@Url.Action("Index", "ProjectSites")"><span>Project Site</span></a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ProjectSitePlanTasks" ? "active" : "")"><a href="@Url.Action("Index", "ProjectSitePlanTasks")"><span>Site Plan Task</span></a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ManualStatus" ? "active" : "")"><a href="@Url.Action("Index", "ManualStatus")"><span>Project Status</span></a></li>
+
+
+                                    </ul>
+                                </li>
+                                <li><a href="@Url.Action("Gallery","SiteImage")"><i class="icon-image2"></i> <span>Gallery</span></a></li>
+                                <li>
+                                    <a href="#"><i class=" icon-file-empty"></i> <span>Parameter</span></a>
+                                    <ul>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "CompanyInformations" ? "active" : "")"><a href="@Url.Action("Details","CompanyInformations")" id="layout1">Company Information</a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Clients" ? "active" : "")"><a href="@Url.Action("Index","Clients")" id="layout1">Clients Information</a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ProjectGroups" ? "active" : "")"><a href="@Url.Action("Index","ProjectGroups")" id="layout1">Project Groups</a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "CompanyResources" ? "active" : "")"><a href="@Url.Action("Index", "CompanyResources")" id="layout1">Employee Information</a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ProjectTask" ? "active" : "")"><a href="@Url.Action("Index", "ProjectTask")" id="layout1">Task</a></li>
+                                      
+
+                                                                          
+                                    </ul>
+                                </li>
+                             
+                                <li>
+                                    <a href="#"><i class=" icon-file-check"></i> <span>Reports</span></a>
+                                    <ul>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Report" ? "active" : "")"><a href="@Url.Action("ProjectStatusReport", "Report")" id="layout1">Project Status Report</a></li>
+                                    
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#"><i class=" icon-file-check"></i> <span>Tools</span></a>
+                                    <ul>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Tools" ? "active" : "")"><a href="@Url.Action("ImportData", "Tools")" id="layout1">Import Data</a></li>
+
+                                    </ul>
+                                </li>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                <li>
+                                    <a href="#"><i class="icon-user-check"></i> <span>Admin</span></a>
+                                    <ul>                                        
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Account" && ViewContext.RouteData.Values["Action"].ToString() == "ListUser" ? "active" : "")"><a href="@Url.Action("ListUser", "Account")" id="layout1">Users</a></li>
+                                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Account" && ViewContext.RouteData.Values["Action"].ToString() == "ListUserRole" ? "active" : "")"><a href="@Url.Action("ListUserRole", "Account")" id="layout1">Permissions</a></li>
+
+                                    </ul>
+                                </li>
+                                }
+                                <!-- /page kits -->
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /main navigation -->
+                </div>
+            </div>
+            <!-- /main sidebar -->
+            <!-- Main content -->
+            <div class="content-wrapper">
+
+
+                <!-- Content area -->
+                <div class="content" id="content">
+                    <div id="dvLoading"></div>
+                    @{ Html.RenderPartial("_Alerts"); }
+                    @RenderBody()
+                    <!-- Footer -->
+                    <div class="footer text-muted">
+                        &copy; @DateTime.Now.Year <a href="#">Audit Reporting System</a> by <a href="#" target="_blank">Convince Computer Ltd.</a>
+                    </div>
+
+
+                    <!-- /footer -->
+                </div>
+                <!-- /content area -->
+            </div>
+            <!-- /main content -->
+        </div>
+        <!-- /page content -->
+    </div>
+    <!-- /page container -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/limitless")
+
+
+    <script type="text/javascript">
+        $(function () { // will trigger when the document is ready
+            $('.datepicker').datepicker({
+                format: 'mm/dd/yyyy',
+            });
+        });
+    </script>
+
+
+    <script>
+
+        //$(document).ready(function () {
+
+        //    setTimeout(function () {
+        //        $(".alert").hide();
+        //    }, 10000);
+
+
+        //});
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

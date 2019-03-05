@@ -1,0 +1,247 @@
+﻿@model AuditReport.Models.ProjectSite
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-10">
+        <!-- Basic layout-->
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title"><i class="icon-stack-plus position-left"></i> Create Project Site</h5><hr />
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li><a data-action="collapse"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+
+
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("ProjectId", null, "--Select--", htmlAttributes: new { @class = "form-control select2"})
+                                @Html.ValidationMessageFor(model => model.ProjectId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Site Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SiteStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EnumDropDownListFor(model => model.SiteStatus, htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.SiteStatus, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remarks, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Remarks, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Remarks, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <!-- Basic layout-->
+                            <div class="panel panel-flat">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title"><i class="icon-stack-plus position-left"></i> Add Project Site Resource</h5><hr />
+                                    <div class="heading-elements">
+                                        <ul class="icons-list">
+                                            <li><a data-action="collapse"></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label class="sr-only"></label>
+                                            <p class="form-control-static">Resource Name</p>
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.DropDownList("RName", null,"Select", new { @id = "RName", @class = "form-control", @style = "width:500px;", @data_val = "true", @data_required = "true" })
+                                            @Html.ValidationMessage("RName", "", new { @class = "text-danger" })
+                                        </div>
+                                        <button type="button" class="btn btn-primary add-Resource">Add Resource</button>
+                                    </div>
+                                    <br />
+                                    <table class="Resource-list table table-bordered">
+                                        <tr class="bg-blue"><th>Resource Name</th><th>Resource Position</th><th></th></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+    @*<input type="file" id="siteimg" multiple />*@
+
+                    <div class="form-group">
+                        <div class="col-md-offset-5 col-md-10">
+                            <button type="button"  class="btn btn-primary" id="SaveSite"><i class="icon-add position-left"></i>  Save</button>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    var counter = 0;
+    jQuery('.add-Resource').click(function (event) {
+
+        event.preventDefault();
+        counter++;
+
+        var ResourceId = $('#RName').val();
+
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            type: "get",
+            dataType: "json",
+            data: { id: ResourceId },
+            url: "/Projects/GetResources",
+            success: function (result) {
+
+                var newRow = jQuery('<tr><td> <input value="' + result.Id + '" readonly="true" type="hidden" name="ResourceId"/> <input class="form-control" value="' + result.Name + '" readonly="true" type="text" name="ResourceName' +
+                   counter + '"/></td><td><input class="form-control" value="' + result.Position + '"  readonly="true" type="text" name="ResourcePosition' +
+                   counter + '"/></td> <td> <input type="button" class="btn btn-danger btn-xs" value="Delete" onclick="$(this).parent().parent().remove();" /></td></tr>');
+
+
+
+                jQuery('table.Resource-list').append(newRow);
+
+            }
+        });
+
+    });
+
+
+    $('#SaveSite').click(function (e) {
+        
+        if ($('#ProjectId option:selected').text() === "--Select--") {
+            alert('Please select project');
+            $('#ProjectId option:selected').focus();
+
+        }        
+        else if ($.trim($('#Name').val()) === "") {
+            alert('Site name required');
+            $('#Name').focus();
+        }
+        else if ($.trim($('#Location').val()) === "") {
+            alert('Location required');
+            $('#Location').focus();
+        }
+        else {
+            CreateProjectSite();
+        }
+
+    });
+
+
+
+
+    function CreateProjectSite()
+    {
+        //var files = document.getElementById("siteimg").files;
+     
+        //if (window.FormData !== undefined) {
+        //    var data = new FormData();
+        //    for (var x = 0; x < files.length; x++) {
+        //        data.append("file" + x, files[x]);
+        //    }
+        //}
+
+        var ProjectId = document.getElementById("ProjectId");
+        var Name = document.getElementById("Name");
+        var Location = document.getElementById("Location");
+        var Remarks = document.getElementById("Remarks");
+        var Status = document.getElementById("SiteStatus");
+        var ResourceId = document.getElementsByName("ResourceId");
+        //var images = document.getElementById("siteimg");
+
+        var ResourceDetails = [];
+
+        for (var i = 0; i < ResourceId.length; i++)
+        {
+            ResourceDetails.push({ Id: ResourceId[i].value });
+        }
+
+        ResourceDetails = JSON.stringify({ 'ResourceDetails': ResourceDetails, 'ProjectId': ProjectId.value, 'Name': Name.value, 'Location': Location.value, 'Remarks': Remarks.value, 'Status': Status.value });
+
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: '/ProjectSites/SiteCreate',
+            traditional: true,
+            data: ResourceDetails,
+            success: function (result) {
+                console.log(result);
+                if (result.flag)
+                {                 
+                    window.location = "/ProjectSites/Index";
+                    alert("Record save successfully!");
+                }
+                else
+                {
+                    alert(result.message)
+                }
+            },
+            failure: function (response) {
+                alert('Error');
+            }
+        });
+
+
+    };
+</script>
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+
+
+<script src="~/Plugins/select2/select2.min.js"></script>
+<script>
+    $(".select2").select2();
+</script>
+
+
+
+
+
+}

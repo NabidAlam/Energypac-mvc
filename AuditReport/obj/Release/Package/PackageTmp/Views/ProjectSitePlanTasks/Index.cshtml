@@ -1,0 +1,243 @@
+﻿
+
+@model PagedList.IPagedList<AuditReport.Models.ProjectSitePlan>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+}
+
+@if (TempData["messageCRUD"] != null)
+{
+    if (TempData["messageClass"] == null)
+    {
+        <div class="message-info">@TempData["messageCRUD"]</div>
+    }
+    else
+    {
+        <div class="@TempData["messageClass"]">@TempData["messageCRUD"]</div>
+    }
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title"><i class="icon-task position-left"></i>Site Plans List</h5><hr />
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-action="collapse"></a></li>
+                <li><a data-action="reload"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel-body">
+        <p>
+            <div class="col-md-3">
+                @if (User.IsInRole("Management"))
+                {
+                    @Html.ActionLink("Create New Plan", "Create", null, new { @class = "btn btn-success btn-xs" })
+                }
+            </div>
+            <div class="col-md-6">
+                @using (@Html.BeginForm("Index", "ProjectSitePlanTasks", FormMethod.Post))
+                {
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("ProjectId", null, "--Select--", new { @class = "form-control select2", @required = "required", @Id = "ProjectId" })
+                               
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Site", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("SiteId", new SelectList(string.Empty, "Value", "Text"), "--Select--", new { @required = "required", @class = "form-control select2", @Id = "SiteId" })
+                              
+                            </div>
+                        </div>
+                        <div class="form-group">
+                          
+                            <div class="col-md-offset-2 col-md-10">
+                              <input value="Search" class="btn btn-primary" type="submit" />
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+               
+            </div>
+</p>
+
+    </div>
+    <div class="table-responsive">
+
+        <table class="table table-xxs">
+            <tr class="bg-blue">
+                <th>
+                    Project Name
+                </th>
+                <th>
+                    Site Name
+                </th>
+                <th>Status</th>
+                <th>
+                    Plan Code
+                </th>
+                <th>
+                    Plan Date
+                </th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+
+                var ProjectName = db.Project.Where(x => x.Id == item.ProjectSite.ProjectId).Select(y => y.Name).FirstOrDefault();
+                var SiteName = db.ProjectSite.Where(x => x.Id == item.ProjectSiteId).Select(y => y.Name).FirstOrDefault();
+                //var StatusCount = db.ProjectSiteStatus.Where(x => x.PlanCode==item.PlanCode).Select(y=>y.SiteStatusDate).Distinct().Count();
+                //var StatusCount = db.ProjectSiteStatus.Where(x => x.ProjectSitePlanTaskId == item.).Select(y => y.SiteStatusDate).Distinct().Count();
+
+                var StatusCount = (from status in db.ProjectSiteStatus
+                                  join siteTask in db.ProjectSitePlanTask on status.ProjectSitePlanTaskId equals siteTask.Id
+                                  where siteTask.ProjectSitePlanId == item.Id
+                                  select status.SiteStatusDate).Distinct().Count();
+
+                <tr>
+                    <td>
+                        @*@ProjectName*@ 
+                        @Html.ActionLink(ProjectName, "Details", "Projects", new { id = item.ProjectSite.ProjectId}, null)
+                    </td>
+                    <td>
+                       
+                  @*@SiteName*@
+                    @Html.ActionLink(SiteName, "Details", "ProjectSites", new { id = item.ProjectSiteId}, null)
+
+                      </td>
+                    <td>
+                        @*@Html.ActionLink(@StatusCount + " Status", "statusList", "ProjectSitePlanTasks", new { SitePlanDate = item.SitePlanDate, ProjectId = item.ProjectId, SiteId = item.ProjectSiteId, PlanCode = item.PlanCode }, new { @class = "label label-info" })*@
+                        @if (item.Active == "I" && StatusCount == 0)
+                        {
+                            <span class="label label-info">@StatusCount Status</span>
+                        }
+                        else
+                        {
+                        @Html.ActionLink(@StatusCount + " Status", "StatusList", "ProjectSitePlanTasks", new { PId = item.Id }, new { @class = "label label-info" })
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PlanCode)
+                        @*@Html.ActionLink(@item.PlanCode, "ProjectSitePlanTaskInfo", "ProjectSitePlanTasks", new { plancode = item.PlanCode, ProjectId=item.ProjID, SiteId=item.SiteId, PlanDate=item.SitePlanDate}, new { @class = "label label-info" })*@
+                       
+                    </td>
+                    <td>
+                        @*@Html.ActionLink(@item.SitePlanDate.ToShortDateString(), "statusList", "ProjectSitePlanTasks", new { SitePlanDate = item.SitePlanDate, ProjectId = item.ProjectId, SiteId = item.ProjectSiteId, PlanCode=item.PlanCode }, new { @class = "label label-info" })*@
+                        @item.SitePlanDate.ToShortDateString()
+                    </td>
+                    <td>@(item.Active=="A"?"Active":"Inactive")</td>
+                    <td>
+                       
+                        @*@Html.ActionLink(" ", "Edit", new { id = item.PlanCode }, new { @class = "btn btn-xs text-info icon-pencil4", @title = "Edit" }) |*@
+                        @*@Html.ActionLink(" ", "EditPlanTask", new {  ProjectId =Convert.ToInt32(  item.ProjectId), SiteId =Convert.ToInt32( item.ProjectSiteId), PlanDate = item.SitePlanDate }, new { @class = "btn btn-xs text-info  icon-pencil4", @title = "Edit Plan Task" }) |*@
+                        @Html.ActionLink(" ", "EditPlanTask", new { PId = item.Id, ProjectId = item.ProjectSite.ProjectId, SiteId = Convert.ToInt32(item.ProjectSiteId)}, new { @class = "btn btn-xs text-info  icon-pencil4", @title = "Edit Plan Task" }) |
+                        @*@Html.ActionLink(" ", "ImageUpload", "SiteImage", new {  ProjectId = item.ProjectId, SiteId = item.ProjectSiteId, PlanDate = item.SitePlanDate }, new { @class = "btn btn-xs text-info icon-images2", @title = "Upload Image" })*@
+                        @Html.ActionLink(" ", "ImageUpload", "SiteImage", new {ProjectId= item.ProjectSite.ProjectId, SiteId = item.ProjectSiteId, PlanDate = item.SitePlanDate.ToString("dd/MM/yyyy")}, new { @class = "btn btn-xs text-info icon-images2", @title = "Upload Image" })
+                        @*@Html.ActionLink(" ","Delete", new { id = item.PlanCode }, new { @class = "btn btn-xs text-danger icon-cross2", @title = "Delete", onclick = "deleteFunction(@item.PlanCode);" })*@
+                        @*<a class="btn btn-xs text-danger icon-cross2" , title="Delete" href="javascript:deleteFunction(@item.ProjectId, @item.ProjectSiteId,'@item.PlanCode')"></a>*@
+                        <a class="btn btn-xs text-danger icon-cross2" , title="Delete" href="javascript:deleteFunction( @item.Id)"></a>
+                    </td>
+                </tr>
+            }
+        </table>
+
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page, SiteId= ViewBag.SiteId }))
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(
+ function (Id) {
+
+     $("#ProjectId").change(function () {
+
+         $.ajax({
+             type: "post",
+             url: "/Projects/Sites",
+             data: { ProjectId: $('#ProjectId').val() },
+             datatype: "json",
+             traditional: true,
+             success: function (data) {
+                 var sites = "<select id='sites'>";
+                 sites = sites + '<option value="">--Select--</option>';
+                 for (var i = 0; i < data.length; i++) {
+                     sites = sites + '<option value=' + data[i].Value + '>' + data[i].Text + '</option>';
+                 }
+                 sites = sites + '</select>';
+                 $('#SiteId').html(sites);
+             }
+         });
+
+     });
+
+ });
+
+
+
+</script>
+
+
+
+
+                               @Scripts.Render("~/bundles/jqueryval")
+                               <script src="~/Plugins/select2/select2.min.js"></script>
+                               <script>
+                                   $(".select2").select2();
+                               </script>
+
+
+
+<script>
+    function deleteFunction(SitePlanId) {
+        var Con = confirm("are you sure want to delete this ?");
+        if (Con == true) {
+            $.ajax({
+                url: "/ProjectSitePlanTasks/DeletePlan",
+                type: "post",
+                data: {
+                    SitePlandId: SitePlanId
+                },
+                dataType: "json",
+
+                success: function(flag) {
+                    console.log(flag);
+
+                    //alert(flag.flag);
+                    //alert(flag.message);
+
+
+                    if (flag.flag == true) {
+                        window.location = "/ProjectSitePlanTasks/Index";
+                        alert("Successfully deleted !");
+                    } else {
+                        alert(flag.message);
+                    }
+                },
+
+                error: function(xhr) {
+                    alert('error');
+
+                }
+
+
+            });
+        }
+
+    }
+</script>
+

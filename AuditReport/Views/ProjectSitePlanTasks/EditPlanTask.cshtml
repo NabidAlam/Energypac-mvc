@@ -1,0 +1,1153 @@
+﻿@model AuditReport.Models.ProjectSitePlanTask
+@{
+    ViewBag.Title = "EditPlanTask";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+        <!-- Basic layout-->
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title"><i class="icon-stack-plus position-left"></i> Create Site Plan Task Information</h5><hr />
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li><a data-action="collapse"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+
+
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.Label("Project", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("ProjectId", null, "--Select--", htmlAttributes: new { @class = "form-control select2", @data_required = "required" })
+                                @*@Html.ValidationMessageFor(model => model.ProjectId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Site", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("SiteId", null, "--Select--", htmlAttributes: new { @class = "form-control select2" })
+                                @*@Html.ValidationMessageFor(model => model.ProjectSiteId, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table">
+                        <tr>
+                            <td>Plan Date</td>
+                            <td>
+                                @Html.TextBox("PlanDate", null, new { @class = "form-control datepicker", @data_required = "required" })
+                                @Html.ValidationMessage("PlanDate", "", new { @class = "text-danger" })
+                            </td>
+                            <td>Plan Code</td>
+                            <td>
+                                @Html.TextBox("PlanCode", null, new { @class = "form-control", @data_required = "required" })
+                                @Html.ValidationMessage("PlanCode", "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Active</td>
+                            <td>
+                                @Html.DropDownList("Status", null, "--Select--", new { @class = "form-control" })
+                                @Html.ValidationMessage("Status", "", new { @class = "text-danger" })
+                            </td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                    </table>
+                    <hr />
+                    <p><button type="button" class="btn btn-primary btn-xs add-Task"><i class="icon-add position-left"></i> Add</button></p>
+                    <div class="table-responsive">
+                        <table class="table table-xxs table-bordered Task-list" id="TaskTable">
+                            <thead>
+                            <tr class="bg-blue">
+                                <th>#</th>
+                                <th>Task Name</th>
+                                <th>WBS<a href="#" data-toggle="tooltip" data-placement="top" title="Work Break Down Code"><i class="icon-help position-left"></i></a></th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>&nbsp;</th>
+                                <th>Wght. Avg</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <table class="table table-bordered">
+                            <tr>
+                                <td><button type="button" id="MakeSubTask" class="btn btn-primary btn-xs">Make SubTask</button></td>
+                                <td><button type="button" id="UndoSubTask" class="btn btn-primary btn-xs">Undo SubTask</button></td>
+                                <td><button type="button" id="MakeMileStone" class="btn btn-primary btn-xs">Make Milestone</button></td>
+                                <td><button type="button" id="UndoMileStone" class="btn btn-primary btn-xs">Undo Milestone</button></td>
+                                @*<td><button type="button" id="dltTask" class="btn btn-primary btn-xs">Delete Task</button></td>*@
+                            </tr>
+                        </table>
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+                        <div class="col-md-offset-5 col-md-10">
+                            <button type="button" id="SavePlan" class="btn btn-success"><i class="icon-add position-left"></i>  Update</button>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    
+
+<style>
+
+</style>
+
+
+<script type="text/javascript">
+    var counter = 0;
+    var cnTaskRow = 0;
+
+    function UpdateTableRowIndex()
+    {
+        $('td.index').each(function(idx, elem){
+            $(elem).text(idx+1);
+        });
+    };
+
+    function GetSepString(cnt)
+    {
+        var strSep = '';      
+
+        for (var i=0; i<parseInt(cnt); i++)
+        {
+            strSep = strSep + "- &gt; ";
+        }
+
+        return strSep;
+    }
+
+    function RebindDatePicker()
+    {
+        $('.datepicker').datepicker("destroy");
+        $('.datepicker').datepicker({
+            format: 'dd/mm/yyyy',
+            todayHighlight: true,
+            todayBtn: true,
+        });
+        // jquery validator bug fix using moment
+        $.validator.methods.date = function (value, element) {
+            return this.optional(element) || moment(value, "DD/MM/YYYY", true).isValid();
+        }
+
+    }
+
+    function UpdateTableMilestoneColor()
+    {
+        //alert('helo');
+        for (var cn2=1; cn2 < $('#TaskTable tr').length;cn2++) // 
+        {
+            //alert(cn2);
+            if ($('#TaskTable tr').eq(cn2).find("td:eq(1) input.Milestone").val()=='Y')
+            {
+                $('#TaskTable tr').eq(cn2).find("td:eq(1) input.taskname").css("color", "green");
+            }
+            else
+            {
+                $('#TaskTable tr').eq(cn2).find("td:eq(1) input.taskname").css("color", "black");
+            }
+
+            
+        }
+    }
+
+    $(document).ready(function () {
+
+        var Id = @ViewBag.PId;
+        //var ProjectId = document.getElementById("ProjectId");
+        //var SiteId = document.getElementById("SiteId");
+        //var PlanDate = document.getElementById("PlanDate");
+        //var PlanCode = document.getElementById("PlanCode");
+        //var TaskId = document.getElementsByName("TID");
+        //var WBS = document.getElementsByName("WBS");
+        //var StartDate = document.getElementsByName("StartDate");
+        //var EndDate = document.getElementsByName("EndDate");
+        //var WeightedAvg = document.getElementsByName("WeightedAvg");
+        $.ajax({
+            url: '/ProjectSitePlanTasks/getEditPlanTask/',
+            data: { PId: Id},
+            dataType: 'json',
+            TYPE: 'POST',
+            success: function (data) {
+                console.log(data);
+                for (var i = 0; i < data.length; i++) {
+                    counter++;
+                    cnTaskRow++;
+                    
+                    if (data[i].flag)
+                    {
+                        //var row = $('<tr><td><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" value="' + data[i].TaskId + '" class="TID"/> <input class="form-control taskname" value="' + data[i].Name + '" style="width:300px;font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" value="' + data[i].WBS + '" name="WBS"/></td><td> <input class="form-control dt datepicker" style="width:80px;" type="text" value="' + data[i].StartDate + '"  name="StartDate"/></td><td> <input class="form-control dt" type="text" style="width:80px;" value="' + data[i].EndDate + '" name="EndDate"/></td>  <td><input type="checkbox"   /></td><td> <input class="form-control" type="text" style="width:100px;" value="' + data[i].Remarks + '" name="Remarks"/></td></tr>');
+
+                        //$('#TaskTable').append(row);
+                        //$("input[name='StartDate']").addClass('datepicker').datepicker();
+                        //$("input[name='EndDate']").addClass('datepicker').datepicker();
+                    }
+                    else
+                    {
+                        //var row = $('<tr><td><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" value="' + data[i].TaskId + '" class="TID"/> <input class="form-control taskname" value="' + data[i].Name + '" style="width:300px;font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" value="' + data[i].WBS + '" name="WBS"/></td><td> <input class="form-control dt datepicker" type="text" style="width:80px;" value="' + data[i].StartDate + '"  name="StartDate"/></td><td> <input class="form-control dt" type="text" style="width:80px;" value="' + data[i].EndDate + '" name="EndDate"/></td>  <td><button  onclick="$(this).parent().parent().remove(); counter--" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /></td><td> <input class="form-control" type="text" style="width:100px;" value="' + data[i].Remarks + '" name="Remarks"/></td></tr>');
+                        
+                        var row = $('<tr id="taskRowId_' 
+                            + cnTaskRow + '"><td class="index"><label name="TaskId">' 
+                            + counter + '</label></td>'
+                            +'<td> <input type="hidden" name="TID" class="TID" value="' + data[i].TaskId + '" /> <input type="hidden" name="ConId" class="ConId" value="' + data[i].ConId + '" /> '
+                            +'<input type="hidden" name="TempTaskId" class="TempTaskId" value="'+ cnTaskRow +'" /> '
+                            +'<input type="hidden" name="PlanTaskId" class="PlanTaskId" value="' + data[i].PlanTaskId + '" /> ' 
+                            + '<input type="hidden" name="IndLevel" class="IndLevel" value="' + data[i].IndLevel + '" /> '
+                            + '<input type="hidden" name="Milestone" class="Milestone" value="' + data[i].Milestone + '" /> '
+                            +'<div class="input-group"><span class="input-group-addon">' + GetSepString(data[i].IndLevel) + '</span><input class="form-control taskname" style="width:260px;font-weight:bold" type="text" name="Task" value="' + data[i].Name + '"/></div></td>'
+                            +'<td> <input class="form-control" style="width:60px;" type="text" name="WBS" value="' + data[i].WBS + '" /></td>'
+                            +'<td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate" value="' + data[i].StartDate + '" /></td>'
+                            +'<td> <input class="form-control dt datepicker" type="text" style="width:80px;" name="EndDate" value="' + data[i].EndDate + '" /></td>'
+                            +'<td><button  onclick="RemoveTask(this)" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button> <input type="checkbox"  /> <button   type="button"  onclick="AddNewRowAfter(this);"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td>'
+                            +'<td> <input class="form-control" type="text" style="width:100px;" name="WeightedAvg" value="' + data[i].WeightedAvg + '" /></td></tr>');
+
+                        $('#TaskTable').append(row);
+                        //$("input[name='StartDate']").addClass('datepicker').datepicker();
+                        //$("input[name='EndDate']").addClass('datepicker').datepicker();
+                    }
+                   
+                }
+                                              
+
+                RebindDatePicker();
+                UpdateTableMilestoneColor();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('Error: ' + textStatus + ' - ' + errorThrown);
+            }
+        });
+    });
+    jQuery('.add-Task').click(function (event) {
+        
+        AddNewRow();
+        
+        //counter++;
+        //event.preventDefault();
+        //var d = new Date();
+
+        //var month = d.getMonth() + 1;
+        //var day = d.getDate();
+
+        //var currentdate =
+        //    (('' + month).length < 2 ? '0' : '') + month + '/' +
+        //    (('' + day).length < 2 ? '0' : '') + day + '/' +
+        //    d.getFullYear();
+
+
+        //var newRow = jQuery('<tr><td class="index"><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" class="TID"/> <input class="form-control taskname" style="font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" name="WBS"/></td><td> <input class="form-control dt datepicker" type="text"  name="StartDate"/></td><td> <input class="form-control dt" type="text" name="EndDate"/></td>  <td><button  onclick="$(this).parent().parent().remove(); counter--" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /></td><td> <input class="form-control" type="text" name="Remarks"/></td></tr>');
+
+
+
+        //jQuery('table.Task-list').append(newRow);
+
+        //$(".dt").val(currentdate);
+        //$("input[name='StartDate']").addClass('datepicker').datepicker();
+        //$("input[name='EndDate']").addClass('datepicker').datepicker();
+
+    });
+
+    
+    function AddNewRow()
+    {
+        cnTaskRow++;
+        counter++;
+        var d = new Date();
+
+        var month = d.getMonth() + 1;
+        var day = d.getDate();
+
+        var currentdate =            
+            (('' + day).length < 2 ? '0' : '') + day + '/' +
+            (('' + month).length < 2 ? '0' : '') + month + '/' +
+            d.getFullYear();
+        
+        //var strSep='- &gt; '; 
+        //for (var i=0;i<counter;i++){
+        //    strSep = strSep + '- &gt ';
+        //}
+     
+        //var newRow = jQuery('<tr><td class="index"><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" class="TID"/> <input class="form-control taskname" style="width:300px;font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" name="WBS"/></td><td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td><td> <input class="form-control dt" type="text" style="width:80px;" name="EndDate"/></td>  <td><button  onclick="$(this).parent().parent().remove(); counter--" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRow();"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td><td> <input class="form-control" type="text" style="width:100px;" name="Remarks"/></td></tr>');
+        var newRow = jQuery('<tr id="taskRowId_' 
+            + cnTaskRow + '"><td class="index"><label name="TaskId">' 
+            + counter + '</label></td>'
+            +'<td> <input type="hidden" name="TID" class="TID"/> <input type="hidden" name="ConId" class="ConId" value="0" /> '
+            +'<input type="hidden" name="TempTaskId" class="TempTaskId" value="'+ cnTaskRow +'" /> '
+            +'<input type="hidden" name="PlanTaskId" class="PlanTaskId" value="0" /> ' 
+            + '<input type="hidden" name="IndLevel" class="IndLevel" value="0" /> '
+            + '<input type="hidden" name="Milestone" class="Milestone" value="N" /> '
+            +'<div class="input-group"><span class="input-group-addon"></span><input class="form-control taskname" style="width:260px;font-weight:bold" type="text" name="Task"/></div></td>'
+            +'<td> <input class="form-control" style="width:60px;" type="text" name="WBS"/></td>'
+            +'<td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td>'
+            +'<td> <input class="form-control dt datepicker" type="text" style="width:80px;" name="EndDate"/></td>'
+            +'<td><button  onclick="RemoveTask(this)" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRowAfter(this);"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td>'
+            +'<td> <input class="form-control" type="text" style="width:100px;" name="WeightedAvg"/></td></tr>');
+     
+
+        jQuery('table.Task-list').append(newRow);
+
+        $(".dt").val(currentdate);
+        //$("input[name='StartDate']").addClass('datepicker').datepicker();
+        //$("input[name='EndDate']").addClass('datepicker').datepicker();
+        RebindDatePicker();
+        UpdateTableRowIndex();
+    }
+
+    
+    function AddNewRowAfter(e)
+    {
+        //console.log($(e).parent().parent().attr('id'));
+        //alert($(e).parent().parent().attr('id'));
+
+        var prevRowIndex = 0;
+        var postRowIndex = 0;
+        var postRowIndLevel = 0;
+        var currRowConId = 0 ;
+        var currRowIndLevel = 0;
+        var currRowSep = '';
+
+        cnTaskRow++;
+        counter++;
+        var d = new Date();
+        
+        var month = d.getMonth() + 1;
+        var day = d.getDate();
+
+        var currentdate =
+            (('' + day).length < 2 ? '0' : '') + day + '/' +
+            (('' + month).length < 2 ? '0' : '') + month + '/' +            
+            d.getFullYear();
+
+        //prevRowIndex = $(e).closest('tr').index();
+        prevRowIndex = $(e).closest('tr').index()+1; //modified
+        postRowIndex = prevRowIndex + 1;
+
+        //alert($(e).closest('tr').find("td:eq(1) span").html());
+        
+        //alert(postRowIndex);
+
+        //alert($('#TaskTable tr').length);
+
+        if (postRowIndex == $('#TaskTable tr').length)
+        {
+            // Insert into last row so no special requirement        
+            
+        }
+        else
+        {
+            
+            postRowIndLevel =  $('#TaskTable tr').eq(postRowIndex).find("td:eq(1) input.IndLevel").val();
+
+            if (postRowIndLevel == 0)
+            {
+                // Insert into a row where the after row is not indented
+                // so no special requirement
+            }
+            else
+            {
+                currRowConId  =  $('#TaskTable tr').eq(postRowIndex).find("td:eq(1) input.ConId").val();
+                currRowIndLevel = postRowIndLevel;
+                currRowSep = $('#TaskTable tr').eq(postRowIndex).find("td:eq(1) span").html();
+            }
+
+        }
+
+
+        //return;
+     
+        //var newRow = jQuery('<tr><td class="index"><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" class="TID"/> <input class="form-control taskname" style="width:300px;font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" name="WBS"/></td><td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td><td> <input class="form-control dt" type="text" style="width:80px;" name="EndDate"/></td>  <td><button  onclick="$(this).parent().parent().remove(); counter--" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRow();"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td><td> <input class="form-control" type="text" style="width:100px;" name="Remarks"/></td></tr>');
+        // var newRow = jQuery('<tr id="taskRowId_' + cnTaskRow + '"><td class="index"><label name="TaskId">' + counter + '</label></td><td> <input type="hidden" name="TID" class="TID"/> <input class="form-control taskname" style="width:300px;font-weight:bold" type="text" name="Task"/></td><td> <input class="form-control" style="width:50px;" type="text" name="WBS"/></td><td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td><td> <input class="form-control dt" type="text" style="width:80px;" name="EndDate"/></td>  <td><button  onclick="$(this).parent().parent().remove(); counter--" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRowAfter(this);"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td><td> <input class="form-control" type="text" style="width:100px;" name="Remarks"/></td></tr>');
+
+        var newRow = jQuery('<tr id="taskRowId_' 
+            + cnTaskRow + '"><td class="index"><label name="TaskId">' 
+            + counter + '</label></td>'
+            + '<td> <input type="hidden" name="TID" class="TID"/> '
+            + '<input type="hidden" name="ConId" class="ConId" value="' + currRowConId + '" /> '
+            + '<input type="hidden" name="TempTaskId" class="TempTaskId" value="'+ cnTaskRow +'" /> '
+            + '<input type="hidden" name="PlanTaskId" class="PlanTaskId" value="0" /> ' 
+            + '<input type="hidden" name="IndLevel" class="IndLevel" value="' + currRowIndLevel + '" /> '
+            + '<input type="hidden" name="Milestone" class="Milestone" value="N" /> '
+            + '<div class="input-group"><span class="input-group-addon">' + currRowSep + '</span><input class="form-control taskname" style="width:260px;font-weight:bold" type="text" name="Task"/></div></td>'
+            + '<td> <input class="form-control" style="width:60px;" type="text" name="WBS"/></td>'
+            + '<td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td>'
+            + '<td> <input class="form-control dt datepicker" type="text" style="width:80px;" name="EndDate"/></td>'
+            + '<td><button  onclick="RemoveTask(this)" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRowAfter(this);"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td>'
+            + '<td> <input class="form-control" type="text" style="width:100px;" name="WeightedAvg"/></td></tr>');
+     
+
+        //var newRow = jQuery('<tr id="taskRowId_' 
+        //    + cnTaskRow + '"><td class="index"><label name="TaskId">' 
+        //    + counter + '</label></td>'
+        //    +'<td> <input type="hidden" name="TID" class="TID"/> <input type="hidden" name="ConId" class="ConId" value="0" /> '
+        //    +'<input type="hidden" name="TempTaskId" class="TempTaskId" value="'+ cnTaskRow +'" /> '
+        //    +'<input type="hidden" name="PlanTaskId" class="PlanTaskId" value="0" /> ' 
+        //    + '<input type="hidden" name="IndLevel" class="IndLevel" value="0" /> '
+        //    +'<div class="input-group"><span class="input-group-addon"></span><input class="form-control taskname" style="width:300px;font-weight:bold" type="text" name="Task"/></div></td>'
+        //    +'<td> <input class="form-control" style="width:50px;" type="text" name="WBS"/></td>'
+        //    +'<td> <input class="form-control dt datepicker" type="text" style="width:80px;"  name="StartDate"/></td>'
+        //    +'<td> <input class="form-control dt" type="text" style="width:80px;" name="EndDate"/></td>'
+        //    +'<td><button  onclick="RemoveTask(this)" type="button" class="btn  text-warning-600 btn-flat btn-icon btn-rounded"><i class="icon-cross"></i></button>  <input type="checkbox"   /> <button   type="button"  onclick="AddNewRowAfter(this);"   class="btn  text-success-600 btn-flat btn-icon btn-rounded "><i class=" icon-plus-circle2"></i></button></td>'
+        //    +'<td> <input class="form-control" type="text" style="width:100px;" name="Remarks"/></td></tr>');
+
+        //$("#" + id + ).closest( "tr" ).after(newRow);
+
+        //jQuery('table.Task-list').append(newRow);
+        var id = $(e).parent().parent().attr('id');
+        
+        $("#" + id ).after(newRow);
+
+        $(".dt").val(currentdate);
+        //$("input[name='StartDate']").addClass('datepicker').datepicker();
+        //$("input[name='EndDate']").addClass('datepicker').datepicker();
+        RebindDatePicker();
+
+        UpdateTableRowIndex();
+    }
+
+    
+    function RemoveTask(e)
+    {
+        //var prevRowIndex = 0;
+        //var postRowIndex = 0;
+        var postRowIndLevel = 0;
+        //var currRowConId = 0 ;
+        var currRowIndLevel = 0;
+        //var currRowSep = '';
+        var currRowIndex = 0;
+        //prevRowIndex = $(e).closest('tr').index();
+        //currRowIndex = $(e).closest('tr').index();
+        currRowIndex = $(e).closest('tr').index() + 1; //modified
+
+        //alert (currRowIndex);
+        //alert ($('#TaskTable tr').length)
+        if (currRowIndex + 1 == $('#TaskTable tr').length)
+        {
+            // delete last row          
+            
+        }
+        else
+        {
+            currRowIndLevel =  $('#TaskTable tr').eq(currRowIndex).find("td:eq(1) input.IndLevel").val();
+           
+            postRowIndLevel =  $('#TaskTable tr').eq(currRowIndex + 1).find("td:eq(1) input.IndLevel").val();
+
+            if (postRowIndLevel > currRowIndLevel)
+            {
+                alert('Row having subtask cannot be deleted.\nDelete subtask first.')
+                return;
+            }            
+
+        }
+        
+        if (confirm('Do you really want to delete?\nThis row will be deleted immediately if you proceed.')==false)
+        {
+            return;
+        }
+
+        var currRowPlanTaskId = $('#TaskTable tr').eq(currRowIndex).find("td:eq(1) input.PlanTaskId").val();
+
+        if (currRowPlanTaskId >0 )
+        {
+            $.ajax({
+                type: "POST",
+                url: "/ProjectSitePlanTasks/DeletePlanTask",            
+                data: { id: currRowPlanTaskId },
+                success: function (data) {
+
+                    if (data.flag)
+                    {
+                        alert("Data deleted successfully !");
+
+                        $(e).parent().parent().remove();
+                        UpdateTableRowIndex();
+                        counter--;
+                    }
+                    else
+                    {
+                        alert(data.message);
+                    }
+                   
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('Error: ' + textStatus + ' - ' + errorThrown);
+                },
+                dataType: "json",
+                traditional: true
+            });
+        }
+        else
+        {
+            $(e).parent().parent().remove();
+            UpdateTableRowIndex();
+            counter--;
+        }
+
+        
+
+        //$('td.index', ui.item.parent()).each(function (i) {
+        //    $(this).html(i + 1);
+        //});
+    }
+
+
+    ////Drag and drop table row
+    var fixHelperModified = function (e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function (index) {
+            $(this).width($originals.eq(index).width())
+            console.log($originals.eq(index).width());
+        });
+        return $helper;
+    },
+    updateIndex = function (e, ui) {
+        //alert(ui.item.closest('tr').index()+1);
+
+        //if (ui.item.closest('tr').index()+1 == 3)
+        //{
+        //    $(this).sortable('cancel');
+        //}
+
+        //alert(ui.item.sortable.index);
+
+        var newIndex = ui.item.index() + 1;
+        var oldIndex = parseInt($(this).attr('data-previndex'));
+        oldIndex = oldIndex + 1;
+        $(this).removeAttr('data-previndex');
+        
+        //alert(newIndex);
+        //alert(oldIndex);
+
+        var oldIndVal = 0
+        var oldPostIndVal = 0
+
+        //oldInvVal = $('#TaskTable tr').eq(newIndex).find("td:eq(1) input.IndLevel").val();
+        //alert(oldInvVal);
+        //alert($('#TaskTable tr').length);
+
+        var newIndVal = 0;
+        var newConId = 0;
+        var newSep = '';
+        
+
+        if (newIndex == oldIndex)
+        {
+            //alert('no work to do');
+            return false;
+        }
+
+        if (oldIndex + 1 == $('#TaskTable tr').length)
+        {
+            //alert('last item no worry');
+            //newIndVal = 0;
+            //newConId = 0;
+            //newSep = 0;
+        }
+        else
+        {
+            oldIndVal = $('#TaskTable tr').eq(newIndex).find("td:eq(1) input.IndLevel").val();
+
+            if (newIndex > oldIndex)
+            {
+                oldPostIndVal = $('#TaskTable tr').eq(oldIndex).find("td:eq(1) input.IndLevel").val();                
+            } 
+            else if (newIndex < oldIndex)
+            {
+                oldPostIndVal = $('#TaskTable tr').eq(oldIndex+1).find("td:eq(1) input.IndLevel").val();  
+            }
+
+            if (oldIndVal < oldPostIndVal)
+            {
+                alert('task having subtask cannot be moved');
+                return false;
+            }
+        }
+
+        // prepare new value for dropped item
+
+        if ((newIndex + 1 == $('#TaskTable tr').length) || (newIndex == 1))
+        {
+            //alert('last or first item no worry');
+            newIndVal = 0;
+            newConId = 0;
+            newSep = '';
+        }
+        else
+        {         
+
+            newIndVal = $('#TaskTable tr').eq(newIndex + 1).find("td:eq(1) input.IndLevel").val();
+            newConId = $('#TaskTable tr').eq(newIndex + 1).find("td:eq(1) input.ConId").val();
+            newSep = $('#TaskTable tr').eq(newIndex + 1).find("td:eq(1) span").html();
+        }
+
+        $('#TaskTable tr').eq(newIndex).find("td:eq(1) input.IndLevel").val(newIndVal);
+        $('#TaskTable tr').eq(newIndex).find("td:eq(1) input.ConId").val(newConId);
+        $('#TaskTable tr').eq(newIndex).find("td:eq(1) span").html(newSep);
+
+        UpdateTableRowIndex();
+
+        //$('#TaskTable tr').eq(prevIndex[i]).find("td:eq(1) span").html()
+        
+        
+        //return false;
+
+        //$(this).sortable("cancel");
+        //$("#TaskTable tbody").sortable("cancel");
+        //$(ui.sender).sortable("cancel");
+        
+        //$('td.index', ui.item.parent()).each(function (i) {
+        //    $(this).html(i + 1);
+        //});
+    };
+    $("#TaskTable tbody").sortable({
+        cursor: "move",
+        start: function(e, ui) {
+            // creates a temporary attribute on the element with the old index
+            $(this).attr('data-previndex', ui.item.index());
+        },
+        //helper: fixHelperModified,
+        stop: updateIndex
+    }).disableSelection();
+    //---------------------end drag ans drop
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    // Save Task
+
+    $(document).on({
+
+        'focus': function () {
+            // something
+        },
+        'blur': function () {
+            var TaskName = $(this).val();
+            // Get the current row
+            var row = $(this).closest('tr');
+            if (TaskName.length != 0) {
+                $.ajax({
+                    url: "/ProjectSitePlanTasks/SaveTask",
+                    type: "POST",
+                    data: { taskname: TaskName },
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.flag == true) {
+                            row.find('input.TID').val(data.Id);
+                        }
+
+
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+
+                    }
+
+                });
+            }
+
+
+        }
+    }, 'input.taskname');
+
+    var options = {
+        source: function (request, response) {
+            $.ajax({
+                url: "/ProjectSitePlanTasks/GetTask",
+                type: "POST",
+                dataType: "json",
+                data: { term: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item.Name, Id: item.Id };
+                    }))
+
+
+                }
+
+
+
+            });
+        },
+        minLength: 1
+    };
+    var selector = 'input.taskname';
+    $(document).on('keydown.autocomplete', selector, function () {
+        $(this).autocomplete(options, {
+            select: function (event, ui) {
+
+                $(this).closest('tr').find("td:eq(1) input.TID").val(ui.item.Id);
+            }
+        });
+
+    });
+
+
+
+
+
+    //$('#MakeSubTask').click(function (e) {
+    //    var ControlId = "";
+    //    var val = [];
+    //    var prevIndex = [];
+    //    $(':checkbox:checked').each(function (i) {
+    //        val[i] = $(this).closest('tr').find("td:eq(1) input.TID").val();
+    //        $(this).closest('tr').find("td:eq(1) input.taskname").css("font-weight", "normal");
+    //        prevIndex[i] = $(this).closest('tr').index() - 1;
+    //    });
+
+
+    //    ControlId = $('#TaskTable tr').eq(prevIndex[0]).find("td:eq(1) input.TID").val();
+    //    if (val.length != 0) {
+    //        var postData = { child: val, parent: ControlId };
+
+    //        $.ajax({
+    //            type: "POST",
+    //            url: "/ProjectSitePlanTasks/MakeSubTask",
+    //            data: postData,
+    //            success: function (data) {
+    //                alert("Data updated successfully !");
+    //            },
+    //            dataType: "json",
+    //            traditional: true
+    //        });
+
+    //    }
+    //    else {
+    //        alert(" oops! You do not select any items !");
+    //    }
+    //});
+
+
+
+    //$('#UndoSubTask').click(function (e) {
+    //    var val = [];
+    //    $(':checkbox:checked').each(function (i) {
+    //        val[i] = $(this).closest('tr').find("td:eq(1) input.TID").val();
+    //        $(this).closest('tr').find("td:eq(1) input.taskname").css("font-weight", "Bold");
+
+    //    });
+    //    if (val.length != 0) {
+    //        var postData = { child: val };
+
+    //        $.ajax({
+    //            type: "POST",
+    //            url: "/ProjectSitePlanTasks/UndoSubTask",
+    //            data: postData,
+    //            success: function (data) {
+    //                alert("Data updated successfully !");
+    //            },
+    //            dataType: "json",
+    //            traditional: true
+    //        });
+
+    //    }
+    //    else {
+    //        alert(" oops! You do not select any items !");
+    //    }
+    //});
+
+
+     
+    // subtask function
+    $('#MakeSubTask').click(function (e) {
+        var ControlId = "";
+        var val = [];
+        var prevIndex = [];
+        var tmpId = [];
+        var strSep="";
+        var strPrevSep ="";
+        var intLevel = 0;
+        var prevIndLevel =0;
+        $(':checkbox:checked').each(function (i) {            
+            
+            prevIndex[i] = $(this).closest('tr').index();
+           
+            if (prevIndex[i]!=0)
+            {
+                
+                strPrevSep = $('#TaskTable tr').eq(prevIndex[i]).find("td:eq(1) span").html();
+
+                strPrevSep = strPrevSep + "- &gt; "; // should be current sep
+                
+                if (strPrevSep !=  $(this).closest('tr').find("td:eq(1) span").html() )
+                {
+                    prevIndLevel = parseInt($('#TaskTable tr').eq(prevIndex[i]).find("td:eq(1) input.IndLevel").val());
+
+                    intLevel= parseInt($(this).closest('tr').find("td:eq(1) input.IndLevel").val()) ;
+                    intLevel= intLevel + 1;
+                    $(this).closest('tr').find("td:eq(1) input.IndLevel").val(intLevel);
+
+                    if (prevIndLevel == intLevel)
+                    {
+                        tmpId[i] = $('#TaskTable tr').eq(prevIndex[i]).find("td:eq(1) input.ConId").val();
+                        $(this).closest('tr').find("td:eq(1) input.ConId").val(tmpId[i]);
+                    }
+                    else if (prevIndLevel < intLevel)
+                    {
+                        tmpId[i] = $('#TaskTable tr').eq(prevIndex[i]).find("td:eq(1) input.TempTaskId").val();
+                        $(this).closest('tr').find("td:eq(1) input.ConId").val(tmpId[i]);
+                    }
+                    else
+                    {
+                        
+                        for (var cn = prevIndex[i]; cn>0; cn--)
+                        {
+                            prevIndLevel = parseInt($('#TaskTable tr').eq(cn).find("td:eq(1) input.IndLevel").val());
+                            if (prevIndLevel == intLevel)
+                            {
+                                tmpId[i] = $('#TaskTable tr').eq(cn).find("td:eq(1) input.ConId").val();
+                                $(this).closest('tr').find("td:eq(1) input.ConId").val(tmpId[i]);
+                                break;
+                            }
+                        }                                
+                    }                 
+                
+                    strSep = $(this).closest('tr').find("td:eq(1) span").html() + "- &gt; ";
+                    $(this).closest('tr').find("td:eq(1) span").html(strSep);
+                                        
+                    var postIndLevel = 0;
+                    for (var cn2=$(this).closest('tr').index() + 1; cn2 < $('#TaskTable tr').length - 1 ;cn2++) // updated
+                    {
+                        postIndLevel = parseInt($('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) input.IndLevel").val());
+                        if (intLevel <= postIndLevel)
+                        {
+                            $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) input.IndLevel").val(postIndLevel + 1);
+
+                            strPrevSep = $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) span").html();
+                            strPrevSep = strPrevSep + "- &gt; ";
+                            $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) span").html(strPrevSep);
+
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }                
+            }
+        });                
+    });
+
+    
+    
+    $('#UndoSubTask').click(function (e) {
+
+        var prevIndex = [];
+        var currIndex = 0;
+        var strSep="";
+        var strPrevSep ="";
+        var intLevel = 0;
+        var prevIndLevel =0;
+        var tmpId = 0;
+
+        $(':checkbox:checked').each(function (i) {            
+            
+            prevIndex[i] = $(this).closest('tr').index(); // modified
+
+            intLevel = parseInt($(this).closest('tr').find("td:eq(1) input.IndLevel").val());
+           
+            currIndex = $(this).closest('tr').index() + 1; // modified
+
+            if (currIndex != 1 &&  intLevel > 0 )
+            {
+
+                intLevel = intLevel - 1;
+
+                $(this).closest('tr').find("td:eq(1) span").html(GetSepString(intLevel));                
+
+                $(this).closest('tr').find("td:eq(1) input.IndLevel").val(intLevel);
+
+                prevIndLevel = parseInt($('#TaskTable tr').eq(currIndex-1).find("td:eq(1) input.IndLevel").val())
+
+                // to set control id
+                if (prevIndLevel == intLevel)
+                {
+                    tmpId = parseInt($('#TaskTable tr').eq(currIndex-1).find("td:eq(1) input.ConId").val())
+                    $(this).closest('tr').find("td:eq(1) input.ConId").val(tmpId);                    
+                }
+                else if (prevIndLevel > intLevel)
+                {
+                    for (var cn = currIndex; cn>0; cn--)
+                    {
+                        prevIndLevel = parseInt($('#TaskTable tr').eq(cn-1).find("td:eq(1) input.IndLevel").val())
+
+                        if (prevIndLevel == intLevel)
+                        {
+                            tmpId = parseInt($('#TaskTable tr').eq(cn-1).find("td:eq(1) input.ConId").val())
+                            $(this).closest('tr').find("td:eq(1) input.ConId").val(tmpId);
+                            break;
+                        }
+
+                    }
+                }
+                else
+                {
+                    alert('Error setting control id !! dont save your data');
+                }
+
+                var flagNoLevel = false;
+                var postIndLevel = 0;
+                for (var cn2=$(this).closest('tr').index() + 1; cn2 < $('#TaskTable tr').length - 1 ;cn2++) //modified
+                {
+                    postIndLevel = parseInt($('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) input.IndLevel").val());
+                    if (intLevel + 1 < postIndLevel) //intLevel <= postIndLevel
+                    {
+                        if (flagNoLevel == false)
+                        {                        
+                            $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) input.IndLevel").val(postIndLevel - 1);                        
+                            $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) span").html(GetSepString(postIndLevel - 1));
+                        }
+                    }
+                    else if (intLevel + 1 == postIndLevel) 
+                    {                        
+                        tmpId = $(this).closest('tr').find("td:eq(1) input.TempTaskId").val(); 
+
+                        $('#TaskTable tr').eq(cn2 + 1).find("td:eq(1) input.ConId").val(tmpId);
+
+                        flagNoLevel = true; // so that no need aligntment or level setting
+
+                    }
+                    else 
+                    {
+                        break;
+                    }
+                }                                 
+            }
+        });    
+
+    });
+
+
+
+    $('#MakeMileStone').click(function (e) {
+        var val = [];
+        $(':checkbox:checked').each(function (i) {
+            val[i] = $(this).closest('tr').find("td:eq(1) input.TID").val();
+            $(this).closest('tr').find("td:eq(1) input.taskname").css("color", "green");
+            $(this).closest('tr').find("td:eq(1) input.Milestone").val('Y');
+        });
+        if (val.length != 0) {
+            //var postData = { child: val };
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/ProjectSitePlanTasks/MakeMileStone",
+            //    data: postData,
+            //    success: function (data) {
+            //        alert("Data updated successfully !");
+            //    },
+            //    dataType: "json",
+            //    traditional: true
+            //});
+        }
+        else {
+            alert(" oops! You do not select any items !");
+        }
+
+    });
+
+
+    $('#UndoMileStone').click(function (e) {
+        var val = [];
+        $(':checkbox:checked').each(function (i) {
+            val[i] = $(this).closest('tr').find("td:eq(1) input.TID").val();
+            $(this).closest('tr').find("td:eq(1) input.taskname").css("color", "black");
+            $(this).closest('tr').find("td:eq(1) input.Milestone").val('N');
+        });
+        if (val.length != 0) {
+            //var postData = { child: val };
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/ProjectSitePlanTasks/UndoMileStone",
+            //    data: postData,
+            //    success: function (data) {
+            //        alert("Data updated successfully !");
+            //    },
+            //    dataType: "json",
+            //    traditional: true
+            //});
+
+        }
+        else {
+            alert(" oops! You do not select any items !");
+        }
+    });
+
+
+
+    //$('#dltTask').click(function (e) {
+    //    var val = [];
+    //    $(':checkbox:checked').each(function (i) {
+    //        val[i] = $(this).closest('tr').find("td:eq(1) input.TID").val();
+
+    //    });
+
+    //    if (val.length != 0) {
+    //        var postData = { child: val };
+
+    //        $.ajax({
+    //            type: "POST",
+    //            url: "/ProjectSitePlanTasks/deleteTask",
+    //            data: postData,
+    //            success: function (data) {
+    //                alert("Data updated successfully !");
+    //            },
+    //            dataType: "json",
+    //            traditional: true
+    //        });
+    //    }
+    //    else {
+    //        alert(" oops! You do not select any items !");
+    //    }
+
+    //});
+
+
+
+    $('#SavePlan').click(function (e) {
+
+        if ($('#ProjectId option:selected').text() === "--Select--"){
+            alert('Please select project');
+            $('#ProjectId option:selected').focus();
+            
+        }
+        else if ($('#SiteId option:selected').text() === "--Select--"){
+            alert('Please select site');
+            $('#SiteId option:selected').focus();
+            
+        }
+        else if ($.trim($('#PlanDate').val()) === ""){
+            alert('Plan date required');
+            $('#PlanDate').focus();            
+        }
+        else if ($.trim($('#PlanCode').val()) === ""){
+            alert('Please insert plancode');
+            $('#PlanCode').focus();            
+        }
+        else if ($('#Status option:selected').text() === "--Select--"){
+            alert('Please select plan status active/inactive');
+            $('#Status option:selected').focus();
+            
+        }
+        else
+        {
+            CreateSitePlanTask();
+        }
+
+    });
+    //-----------------save site plan task
+
+    function CreateSitePlanTask() {
+        var PId = @ViewBag.PId; 
+        //var ProjectId = document.getElementById("ProjectId");
+        var SiteId = document.getElementById("SiteId");
+        var PlanDate = document.getElementById("PlanDate");
+        var PlanCode = document.getElementById("PlanCode");
+        var Status = document.getElementById("Status"); 
+        var TaskId = document.getElementsByName("TID");
+        var WBS = document.getElementsByName("WBS");
+        var StartDate = document.getElementsByName("StartDate");
+        var EndDate = document.getElementsByName("EndDate");
+        var WeightedAvg = document.getElementsByName("WeightedAvg");
+        var TempTaskId = document.getElementsByName("TempTaskId");
+        var PlanTaskId = document.getElementsByName("PlanTaskId");
+        var ConId = document.getElementsByName("ConId");
+        var Milestone = document.getElementsByName("Milestone");
+        
+        var Tasks = [];
+        
+        for (var i = 0; i < TaskId.length; i++) {
+            
+            Tasks.push({ TaskId: TaskId[i].value, WBS: WBS[i].value, StartDate: StartDate[i].value, EndDate: EndDate[i].value, WeightedAvg: WeightedAvg[i].value, TempTaskId:TempTaskId[i].value, PlanTaskId:PlanTaskId[i].value, ConId:ConId[i].value, Milestone:Milestone[i].value });            
+        }
+
+        TaskDetails = JSON.stringify({ TaskDetails: Tasks, PId: PId, SiteId: SiteId.value, PlanDate: PlanDate.value, PlanCode: PlanCode.value, Status: Status.value });
+
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: '/ProjectSitePlanTasks/UpdatePlanTask',
+            data: TaskDetails,
+            success: function (result) {
+                console.log(result);
+
+                if (result.flag==true) {
+                    alert("Record save successfully!");
+                    window.location.replace("/ProjectSitePlanTasks/EditPlanTask/?PId=" + PId + "&ProjectId=" + ProjectId.value + "&SiteId=" + SiteId.value);
+                    //$("input[name='Task']").attr('disabled', 'disabled');
+                    //$("input[name='WBS']").attr('disabled', 'disabled');
+                    //$("input[name='StartDate']").attr('disabled', 'disabled');
+                    //$("input[name='EndDate']").attr('disabled', 'disabled');
+                    //$("input[name='Remarks']").attr('disabled', 'disabled');
+                }
+                else {
+                    alert(result.message);
+                }
+
+            },
+            failure: function (response) {
+                alert('Error');
+            }
+        });
+
+
+    };
+    //-------------end site plan task save
+
+</script>
+
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+
+
+
+
+@section Scripts {
+
+ @Scripts.Render("~/bundles/jqueryval")
+
+
+<script src="~/Plugins/select2/select2.min.js"></script>
+<script>
+    $(".select2").select2();
+</script>
+
+
+
+}
+
+
+
+

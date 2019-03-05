@@ -1,0 +1,341 @@
+﻿@using AuditReport.Helper
+@*@model IEnumerable<AuditReport.Models.ProjectSitePlanTask>*@
+@model IEnumerable<AuditReport.ViewModel.VMPlanTaskDispPrevStat>
+@{
+    ViewBag.Title = "ProjectSitePlanTaskInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var counter = 1;
+    AuditReport.Models.EPARSDbContext db = new AuditReport.Models.EPARSDbContext();
+}
+
+@helper GetSepString(int cnt)
+{
+    var strSep = "";
+
+    for (var i = 0; i < cnt ; i++) {
+        strSep = strSep + "--> ";
+    }
+
+    @strSep
+}
+
+<style>
+    /*input[type="text"] {
+     border-top: 0;
+     border-right: 0;
+     border-left: 0;
+     border-color:#e2e2e2;
+     border-width:thin;
+     -webkit-box-shadow: none;
+     box-shadow: none;*/
+}
+</style>
+
+
+    <div class="alert alert-primary text-center">
+        
+        <h5><span class="text-bold">Project Name:</span> @ViewBag.ProjectName </h5>
+        <h6><span class="text-bold">Site Name:</span> @ViewBag.ProjectSiteName </h6>
+        <h4>Project Status</h4>
+        <div class="form-inline">
+            <div class="form-group">
+                <label class="text-bold">Plan Date: </label>
+                <div class="form-control-static">@ViewBag.PlanDate</div>                
+            </div>
+            <div class="form-group">
+                <label class="text-bold">Plan Code: </label>
+                <div class="form-control-static">@ViewBag.PlanCode</div>
+            </div>
+
+            <div class="form-group">
+                <label class="text-bold">Status Date</label>
+                @Html.TextBox("StatusDate", null, new { @class = "form-control datepicker" })
+            </div>
+            <input type="button" class="btn btn-xs btn-success" value="Save" id="saveState" />
+            @Html.Hidden("ProjectId")
+            @Html.Hidden("SiteId")
+        </div>
+    </div>
+
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-xxs StatusTable" id="TaskTable">
+        @*<tr>
+            <td>Plan Date</td>
+            <td>@Html.TextBox("PlanDate", null, new { @disabled="disabled"})</td>
+            <td>Plan Code</td>
+            <td>@Html.TextBox("PlanCode", null, new { @disabled = "disabled", @style = "width:80px;" })</td>
+            <td colspan="3">
+                <input type="button" class="btn-primary" value="Save" id="saveState" />
+                @Html.Hidden("ProjectId")
+                @Html.Hidden("SiteId")
+            </td>
+            <td>Status Date</td>
+            <td>@Html.TextBox("StatusDate", null)</td>
+        </tr>*@
+        <thead>
+        <tr class="bg-blue">
+            <th>Id</th>
+            <th style="min-width:300px;">Task Name</th>
+            <th>WBS</th>
+            @*<th>Start Date (Planned)</th>
+            <th>End Date (Planned)</th>*@
+            <th>Start Date</th>
+            @*<th style="min-width:120px;">Prev Tentative End Date</th>*@
+            <th>Tentative End Date</th>
+            <th>Deviation</th>
+            @*<th>Prev(%) Comp</th>*@
+            <th>Perc(%) Comp</th>
+            @*<th style="min-width:200px;">Previous Status</th>*@
+            <th>Present Status</th>
+            <th>Actual Completion Dt</th>            
+            @*<th>Reason for Deviation</th>*@
+            <th>Remarks</th>
+        </tr>
+        </thead>
+        <tbody>
+@foreach (var item in Model)
+{
+    //var TaskName = db.ProjectTask.Where(x => x.Id == item.ProjectTaskId).Select(y => y.Name).FirstOrDefault();
+    
+    <tr>
+        <td>@counter</td>
+        @if (item.MileStone == "Y")
+        {
+            
+            <td style="color:green;font-weight:bold;">@GetSepString(item.IndLevel) @item.Name @Html.Hidden("TID", @item.TaskId, new { @name = "TID" }) @Html.Hidden("PlanTaskId", @item.PlanTaskId, new { @name = "PlanTaskId" })</td>
+
+        }
+        else
+        {
+            
+            <td style="font-weight:bold;">@GetSepString(item.IndLevel)  @item.Name @Html.Hidden("TID", @item.TaskId, new { @name = "TID" }) @Html.Hidden("PlanTaskId", @item.PlanTaskId, new { @name = "PlanTaskId" })</td>
+        }
+        
+        <td>@item.WBS @Html.Hidden("WBS", @item.WBS, new { @name = "WBS" })@Html.Hidden("ConId", @item.ConId, new { @name = "ConId" })</td>
+        @*<td>@NullHelper.DateToString(item.StartDate) @Html.Hidden("StartDate", NullHelper.DateToString(item.StartDate), new { @name = "StartDate" })</td>
+        <td>@NullHelper.DateToString(item.EndDate) @Html.Hidden("EndDate", @NullHelper.DateToString(item.EndDate), new { @name = "EndDate" })</td>*@        
+        <td>@Html.TextBox("StatusStartDate", item.PrevStartDate == null ? NullHelper.DateToString(item.StartDate) : NullHelper.DateToString(item.PrevStartDate), new { @name = "StatusStartDate", @style = "width:95px;", @class = "form-control", @readonly="readonly" })</td>
+        @*<td>@NullHelper.DateToString(item.PrevEndDate)</td>*@
+        <td>@*@Html.TextBox("StatusEndDate", NullHelper.DateToString(item.PrevEndDate), new { @name = "StatusEndDate", @style = "width:90px;", @class = "form-control datepicker" })*@
+            <input type="text" name="StatusEndDate" value="@NullHelper.DateToString(item.PrevEndDate)" style = "width:95px;" class = "form-control" readonly ="readonly"  />
+        </td>
+        <td>@Html.TextBox("Deviation", null, new { @name = "Deviation", @class = "form-control", @style = "width:50px;", @readonly = "readonly" })</td>
+        @*<td>@item.PrevPerComp</td>*@
+        <td>@Html.TextBox("PerComp", @item.PrevPerComp, new { @name = "PerComp", @class = "form-control", @style = "width:50px;" })</td>
+        @*<td>@item.PrevStatus</td>*@
+        <td>@Html.TextArea("PresentStatus", null,2,17, new { @name = "PresentStatus", @class= "form-control", @style = "width:150px;" })</td>
+        <td>@Html.TextBox("CompletionDate", null, new { @name = "CompletionDate", @style = "width:90px;", @class = "form-control datepicker" })</td>
+        @*<td>@Html.TextBox("ResDeviation", null, new { @name = "ResDeviation" })</td>*@
+        <td>@Html.TextArea("Remarks", null, 2,17, new { @name = "Remarks", @class = "form-control", @style = "width:150px;" })</td>
+    </tr>
+    counter++;
+}
+     </tbody>
+    </table>
+</div>
+
+
+
+
+
+<p><button type="button" class="btn btn-warning btn-sm" onclick="window.location.href='@Url.Action("Index")';"><i class="icon-circle-left2 position-left"></i> Go back</button></p>
+
+
+
+
+
+<script>
+    //
+
+    PopulateDeviation();
+
+    $(document).on({
+        'focus': function () {
+            // something
+        },
+        'change': function () {
+            var PerVal = $(this).val();
+            // Get the current row
+            var row = $(this).closest('tr');
+            if (PerVal.length != 0) {
+                
+                if ($.isNumeric(PerVal)== true)
+                {
+                    if (parseInt(PerVal)==100)
+                    {
+                        if (row.find('input[name=CompletionDate]').val().length == 0)
+                        {
+                            row.find('input[name=CompletionDate]').val($('#StatusDate').val());
+                            new PNotify({
+                                title: 'Task Complete Notice',
+                                text: 'Completion date set to status date:<b> ' + $('#StatusDate').val() + '</b>'
+                            });
+                        }
+                    }
+                    else if (parseInt(PerVal)<0 || parseInt(PerVal)>100)
+                    {
+                        $(this).val('');
+                        alert('Only numeric (0-100) or leave empty');
+                    }
+                }
+                else
+                {
+                    $(this).val('');
+                    alert('Only numeric (0-100) or leave empty');
+                }                
+            }
+        }
+    }, 'input[name=PerComp]');
+
+   
+
+    $('#saveState').click(function (e) {
+        
+        
+        //alert('start');
+        //var PlanCode = $('#PlanCode').val();
+        //var PlanDate = $('#PlanDate').val();
+        //var ProjectId = $('#ProjectId').val();
+        //var SiteId = $('#SiteId').val();
+        var StatusDate = $('#StatusDate').val();
+
+
+        var PlanTaskId = document.getElementsByName("PlanTaskId");
+        //var WBS = document.getElementsByName("WBS");
+        var StatusStartDate = document.getElementsByName("StatusStartDate");
+        var StatusEndDate = document.getElementsByName("StatusEndDate");
+        var Remarks = document.getElementsByName("Remarks");
+        var PerComp = document.getElementsByName("PerComp");
+        var PresentStatus = document.getElementsByName("PresentStatus");
+        //var Deviation = document.getElementsByName("Deviation");
+        //var ResDeviation = document.getElementsByName("ResDeviation");
+        var CompletionDate = document.getElementsByName("CompletionDate");
+        var ConId = document.getElementsByName("ConId");
+        //alert('input record fetch complete');
+
+        var Tasks = [];
+
+        for (var i = 0; i < PlanTaskId.length; i++) {
+
+            //Tasks.push({ TaskId: 0, PlanTaskId: PlanTaskId[i].value, StartDate: StatusStartDate[i].value, EndDate: StatusEndDate[i].value, Remarks: Remarks[i].value, PerComp: PerComp[i].value, PresentStatus: PresentStatus[i].value, Deviation: Deviation[i].value, ResDeviation: ResDeviation[i].value, CompletionDate: CompletionDate[i].value, ConId: ConId[i].value });
+            Tasks.push({ TaskId: 0, PlanTaskId: PlanTaskId[i].value, StartDate: StatusStartDate[i].value, EndDate: StatusEndDate[i].value, Remarks: Remarks[i].value, PerComp: PerComp[i].value, PresentStatus: PresentStatus[i].value, CompletionDate: CompletionDate[i].value, ConId: ConId[i].value });
+
+
+        }
+        console.log(Tasks);
+        TaskDetails = JSON.stringify({ TaskDetails: Tasks, StatusDate: StatusDate });
+
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: '/ProjectSitePlanTasks/SavePlanTaskStatusOp',
+            data: TaskDetails,
+            success: function (result) {
+                console.log(result);
+
+                if (result.flag==true) {
+                    alert("Record save successfully!");
+                    window.location = "/ProjectSitePlanTasks/statusList?PId=@ViewBag.PId";
+                }
+                else {
+                    alert(result.message);
+                }
+
+            },
+            failure: function (response) {
+                alert('Error occured');
+            }
+        });
+
+    });
+
+
+    function PopulateDeviation()
+    {
+        
+        var fromDate = $('#StatusDate').val();
+        var from = moment(fromDate, "DD/MM/YYYY", true);
+        //var to = from;
+        
+        
+        //alert($('#TaskTable tr').length);
+        //return;
+        for (var cn2 = 1; cn2 < $('#TaskTable tr').length; cn2++) // 
+        {
+            //alert($('#TaskTable tr').eq(cn2).find("td input[name=StatusEndDate]").val());
+
+            if ($('#TaskTable tr').eq(cn2).find("td input[name=StatusEndDate]").val() != "")
+            {                
+                if (from.isValid() == true)
+                {
+                    toDate = moment($('#TaskTable tr').eq(cn2).find("td input[name=StatusEndDate]").val(), 'DD/MM/YYYY');
+                    duration = toDate.diff(from, 'days');
+                    $('#TaskTable tr').eq(cn2).find("td input[name=Deviation]").val(duration);
+                    if (duration < 0)
+                    {
+                        $('#TaskTable tr').eq(cn2).addClass("bg-danger-300");
+                    }
+                    else
+                    {
+                        $('#TaskTable tr').eq(cn2).removeClass("bg-danger-300");
+                    }
+                    
+                }
+                else
+                {
+                    
+                    $('#TaskTable tr').eq(cn2).find("td input[name=Deviation]").val('');
+                    $('#TaskTable tr').eq(cn2).removeClass("bg-danger-300");
+                }
+                
+
+                //alert($('#TaskTable tr').eq(cn2).find("td input[name=StatusEndDate]").val());
+            }
+            else
+            {
+                //alert("op 2");
+                $('#TaskTable tr').eq(cn2).find("td input[name=Deviation]").val('');
+            }
+                       
+
+        }
+    }
+
+
+</script>
+
+
+@section Scripts {
+    <script>
+        $("#StatusDate").datepicker({
+            format: 'dd/mm/yyyy',
+            todayHighlight: true,
+            todayBtn: true,
+            autoclose: true,       
+            onSelect: function (e) {
+            PopulateDeviation();
+            }
+        }).on("input change paste", function () {
+            PopulateDeviation();
+        });
+
+        
+
+        //$("input[name=StatusEndDate]").datepicker({
+        //    format: 'dd/mm/yyyy',
+        //    todayHighlight: true,
+        //    todayBtn: true,
+        //    autoclose: true,
+        //    onSelect: function (e) {
+        //        PopulateDeviation();
+        //    }
+        //}).on("input change paste", function () {
+        //    PopulateDeviation();
+        //});
+
+
+</script>
+}
